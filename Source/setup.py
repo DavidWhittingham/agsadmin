@@ -17,7 +17,7 @@ setup(
     
     #misc files to include
     package_data = {
-        "": ["license.txt", "authors.txt"]
+        "": ["LICENSE"]
     },
     
     #PyPI MetaData
@@ -25,6 +25,14 @@ setup(
     description = "ArcGIS Server REST Admin API Proxy",
     license = "BSD 3-Clause",
     keywords = "arcgis esri",
+    url = "https://github.com/DavidWhittingham/agstools",
+    classifiers=(
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python :: 2.7"
+    ),
     
     zip_safe = True
 )
