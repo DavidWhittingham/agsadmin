@@ -8,6 +8,7 @@ Features
 ===============
 
 Currently, agsadmin allows you to perform basic management functions for a map service. For a map service, it can:
+
 - start and stop
 - get statistics
 - get status
