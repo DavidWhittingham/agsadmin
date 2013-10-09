@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "agsadmin", "Source\agsadmin\agsadmin.pyproj", "{E046CE96-74B3-4F69-9905-4B5C567A3B3C}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "tests_agsadmin", "Source\tests\tests_agsadmin.pyproj", "{678278C8-2BEA-4618-A368-D0D314BAA2C1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{57DE9658-6CCF-4EF2-B254-14F00B92D75E}"
+	ProjectSection(SolutionItems) = preProject
+		Source\LICENSE = Source\LICENSE
+		Source\setup.py = Source\setup.py
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E046CE96-74B3-4F69-9905-4B5C567A3B3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E046CE96-74B3-4F69-9905-4B5C567A3B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E046CE96-74B3-4F69-9905-4B5C567A3B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E046CE96-74B3-4F69-9905-4B5C567A3B3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{678278C8-2BEA-4618-A368-D0D314BAA2C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{678278C8-2BEA-4618-A368-D0D314BAA2C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{678278C8-2BEA-4618-A368-D0D314BAA2C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{678278C8-2BEA-4618-A368-D0D314BAA2C1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
