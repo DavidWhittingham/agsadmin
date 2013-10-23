@@ -1,13 +1,20 @@
-from ez_setup import use_setuptools
-use_setuptools()
-    
 import agsadmin
 
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+	
+packages = [
+    "agsadmin",
+    "arcpyext.exceptions",
+    "arcpyext.services"
+]
+	
 setup(
     name = "agsadmin",
     version = agsadmin.__version__,
-    packages = find_packages(),
+    packages = packages,
     
     #dependencies
     install_requires = [
@@ -25,7 +32,7 @@ setup(
     description = "ArcGIS Server REST Admin API Proxy",
     license = "BSD 3-Clause",
     keywords = "arcgis esri",
-    url = "https://github.com/DavidWhittingham/agstools",
+    url = "https://github.com/DavidWhittingham/agsadmin",
     classifiers=(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
