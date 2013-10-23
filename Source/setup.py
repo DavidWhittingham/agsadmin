@@ -7,8 +7,8 @@ except ImportError:
 	
 packages = [
     "agsadmin",
-    "arcpyext.exceptions",
-    "arcpyext.services"
+    "agsadmin.exceptions",
+    "agsadmin.services"
 ]
 	
 setup(
