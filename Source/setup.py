@@ -1,10 +1,11 @@
-import agsadmin
-
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-	
+
+
+with open('agsadmin/_version.py') as fin: exec(fin)
+
 packages = [
     "agsadmin",
     "agsadmin.exceptions",
@@ -13,7 +14,7 @@ packages = [
 	
 setup(
     name = "agsadmin",
-    version = agsadmin.__version__,
+    version = __version__,
     packages = packages,
     
     #dependencies
@@ -28,7 +29,7 @@ setup(
     },
     
     #PyPI MetaData
-    author = agsadmin.__author__,
+    author = __author__,
     description = "ArcGIS Server REST Admin API Proxy",
     license = "BSD 3-Clause",
     keywords = "arcgis esri",
