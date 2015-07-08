@@ -11,7 +11,8 @@ from datetime import timedelta
 
 
 _service_type_map = {
-    "mapserver": services._MapServer
+    "mapserver": services._MapServer,
+    "gpserver": services._GpServer
 }
 
 class RestAdmin(object):
