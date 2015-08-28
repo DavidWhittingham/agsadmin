@@ -21,11 +21,11 @@ def get_public_key(public_key_url):
 def encrypt_request_data(data_dict, key, modulus):
     """
     Encrypts request data using the ArcGIS Server REST Admin API Public Key from an ArcGIS Server instance.
-    According to Esri's documentation, the public key should be retrieved every time a request is sent, as it may 
-    change. This is also backed by Esri's own software, which follows this practice and doesn't cache the key.  As 
+    According to Esri's documentation, the public key should be retrieved every time a request is sent, as it may
+    change. This is also backed by Esri's own software, which follows this practice and doesn't cache the key.  As
     such, each request to this function should ensure it is providing an up-to-date key/modulus pair.
 
-    :param data_dict: The data to be encrypted. The data will not be modified, instead a new dictionary with the 
+    :param data_dict: The data to be encrypted. The data will not be modified, instead a new dictionary with the
         encrypted data will be returned.
     :type data_dict: Dict
 
@@ -35,7 +35,7 @@ def encrypt_request_data(data_dict, key, modulus):
     :param modulus: The ArcGIS Server REST Admin API RSA modulus
     :type modulus: long
 
-    :returns: A new copy of the dictionary with all values encrypted using the public key and the RSA PKCS v1.5 
+    :returns: A new copy of the dictionary with all values encrypted using the public key and the RSA PKCS v1.5
         algorithm.
     :rtype: Dict
     """
@@ -53,7 +53,8 @@ def encrypt_request_data(data_dict, key, modulus):
 
     return new_data
 
-def create_operation_request(base_url, service_name, service_type, operation = None, folder_name = None, method = "POST"):
+def create_operation_request(base_url, service_name, service_type, operation = None, folder_name = None,
+                             method = "POST"):
     """
     Creates an operation request against a given ArcGIS Server Service.
 
@@ -66,7 +67,7 @@ def create_operation_request(base_url, service_name, service_type, operation = N
     :param service_type: The type of the service named in the "service_name" property.
     :type service_type: str
 
-    :param operation: The operation to perform.  If None, no operation is sent and the basic service metadata is 
+    :param operation: The operation to perform.  If None, no operation is sent and the basic service metadata is
         returned.
     :type operation: str
 
@@ -87,31 +88,31 @@ def create_operation_request(base_url, service_name, service_type, operation = N
         operation = operation if not operation == None else "",
         folder = folder_name)
     return requests.Request(method, url)
-    
+
 def send_session_request(session, request, ags_operation = True):
     """
-    For whatever reason, the requests library doesn't use pre-configured authentication or paramater information on a 
-    session object when you use session.send(), so this function takes a session and request object, and uses 
+    For whatever reason, the requests library doesn't use pre-configured authentication or paramater information on a
+    session object when you use session.send(), so this function takes a session and request object, and uses
     session.request() to perform the HTTP request, using the information in the request object.
 
     :param session: The pre-configured session object to use when making the request
     :type session: requests.session
     """
-    
+
     hooks = {}
 
     if ags_operation:
         hooks["response"] = decode_ags_operation
 
-    r = session.request(request.method, request.url, data = request.data, params=request.params, hooks = hooks)
+    r = session.request(request.method, request.url, data = request.data, params = request.params, hooks = hooks)
 
     r.raise_for_status()
     return r
 
 def decode_ags_operation(response, **kwargs):
     """
-    Because Esri don't know how to write a REST service correctly (i.e. one that uses HTTP error codes in the response 
-    headers), we have to untangle there responses to ensure the correct HTTP errors are raised.
+    Because Esri don't know how to write a REST service correctly (i.e. one that uses HTTP error codes in the response
+    headers), we have to untangle responses to ensure the correct HTTP errors are raised.
     """
 
     try:
@@ -124,7 +125,7 @@ def decode_ags_operation(response, **kwargs):
     except ValueError:
         # we've seen instances where ArcGIS Server returns an XML response for errors.
         # we aren't going to parse these, we simply assume the server has lost its mind and return HTTP/500
-        # if Esri fixed there JSON responses so they actually return the correct HTTP code, this wouldn't be an issue
+        # if Esri fixed their JSON responses so they actually return the correct HTTP code, this wouldn't be an issue
         response.status_code = 500
         response.reason = JSON_DECODE_ERROR
 
