@@ -1,6 +1,7 @@
 from requests.exceptions import ConnectionError, HTTPError
 
 from . import services
+from .machines import Machine
 from ._auth import _RestAdminAuth
 from .exceptions import InvalidServiceTypeError, UnknownServiceError, CommunicationError
 from ._utils import send_session_request, create_operation_request
@@ -126,7 +127,10 @@ class RestAdmin(object):
                 raise CommunicationError()
         else:
             raise InvalidServiceTypeError()
-
+    
+    def get_machine(self, name):
+        """Gets a machine proxy by name."""
+        return Machine(self._requests_session, self._server_url_base, name)
 
     def _get_service_meta(self, service_name, service_type, service_folder = None):
         r = create_operation_request(

@@ -5,9 +5,10 @@ from json import dumps
 from requests import Request
 
 from agsadmin._utils import send_session_request, create_operation_request
+from agsadmin._endpoint_base import _EndpointBase
 
 
-class _Service(object):
+class _Service(_EndpointBase):
     """
     Base class for all types of ArcGIS Server services. Implements the core operations supported by all services,
     and decribes abstract properties that need to be supported by all implementors.
@@ -40,25 +41,11 @@ class _Service(object):
         Gets the properties (metadata) of the service.
         """
         return
-
-    @abc.abstractproperty
-    def _session(self):
-        """
-        Gets the Requests session for interacting with this service.
-        """
-        return
     
     @abc.abstractproperty
     def _type(self):
         """
         Gets the type of this service
-        """
-        return
-
-    @abc.abstractproperty
-    def _url_base(self):
-        """
-        Returns the base URL for service operations on this service.
         """
         return
 

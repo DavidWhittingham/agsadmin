@@ -9,7 +9,8 @@ with open('agsadmin/_version.py') as fin: exec(fin)
 packages = [
     "agsadmin",
     "agsadmin.exceptions",
-    "agsadmin.services"
+    "agsadmin.services",
+    "agsadmin.machines"
 ]
 	
 setup(
