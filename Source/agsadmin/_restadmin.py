@@ -90,7 +90,7 @@ class RestAdmin(object):
 
     def get_service(self, service_name, service_type, service_folder = None):
         """Gets a service proxy object by name, type and folder (optional). 
-        Currently allowed service types are: MapServer"""
+        Currently allowed service types are: MapServer, GpServer"""
 
         serv_type = service_type.lower()
         if (serv_type in _service_type_map):
