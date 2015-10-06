@@ -4,7 +4,7 @@ from . import services
 from .machines import Machine
 from ._auth import _RestAdminAuth
 from .exceptions import InvalidServiceTypeError, UnknownServiceError, CommunicationError
-from ._utils import send_session_request, create_operation_request
+from ._utils import get_server_url_base, send_session_request
 
 import requests
 
@@ -69,11 +69,7 @@ class RestAdmin(object):
         :type encrypt: bool
         """
 
-        self._server_url_base = "{protocol}://{hostname}:{port}/{instance}/admin".format(
-            protocol = "https" if use_ssl else "http",
-            hostname = hostname,
-            port = port,
-            instance = instance_name)
+        self._server_url_base = get_server_url_base("https" if use_ssl else "http", hostname, port, instance_name)
         self._requests_session = requests.Session()
         self._requests_session.params = {"f": "json"}
         self._requests_session.auth = _RestAdminAuth(
@@ -94,7 +90,7 @@ class RestAdmin(object):
 
         serv_type = service_type.lower()
         if (serv_type in _service_type_map):
-            meta = self._get_service_meta(service_name, service_type, service_folder)
+            meta = self._get_service_meta(service_name, _service_type_map[serv_type], service_folder)
 
             if not meta == None:
                 return _service_type_map[serv_type](
@@ -112,9 +108,8 @@ class RestAdmin(object):
     def delete_service(self, service_name, service_type, service_folder = None):
         serv_type = service_type.lower()
         if (serv_type in _service_type_map):
-            request = create_operation_request(
-                    self._server_url_base, service_name, service_type, folder_name = service_folder,
-                    operation = "delete", method = "POST")
+            url = _service_type_map[serv_type]._get_service_url(self._server_url_base, service_name, folder_name)
+            request = _service_type_map[serv_type]._create_operation_request(url, operation = "delete", method = "POST")
 
             try:
                 response = send_session_request(self._requests_session, request).json()
@@ -132,9 +127,9 @@ class RestAdmin(object):
         """Gets a machine proxy by name."""
         return Machine(self._requests_session, self._server_url_base, name)
 
-    def _get_service_meta(self, service_name, service_type, service_folder = None):
-        r = create_operation_request(
-                self._server_url_base, service_name, service_type, folder_name = service_folder, method = "GET")
+    def _get_service_meta(self, service_name, service_class, service_folder = None):
+        url = service_class._get_service_url(self._server_url_base, service_name, service_folder)
+        r = service_class._create_operation_request(url, method = "GET")
 
         meta = None
 

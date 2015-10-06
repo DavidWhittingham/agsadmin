@@ -53,42 +53,6 @@ def encrypt_request_data(data_dict, key, modulus):
 
     return new_data
 
-def create_operation_request(base_url, service_name, service_type, operation = None, folder_name = None,
-                             method = "POST"):
-    """
-    Creates an operation request against a given ArcGIS Server Service.
-
-    :param base_url: The base URL of the ArcGIS Server Admin API (usually 'http://serverName:port/instance_name/admin')
-    :type base_url: str
-
-    :param service_name: The name of the service to perform an operation on.
-    :type service_name: str
-
-    :param service_type: The type of the service named in the "service_name" property.
-    :type service_type: str
-
-    :param operation: The operation to perform.  If None, no operation is sent and the basic service metadata is
-        returned.
-    :type operation: str
-
-    :param folder_name: If the service is not at the root level, specify the folder it resides in.
-    :type folder_name: str
-
-    :param method: Overrides the HTTP verb to use on the request, default is POST but some operations accept/require GET
-    :type method: str
-    """
-
-    url = "{base}/services/{service}.{type}/{operation}" \
-        if folder_name == None or len(folder_name.strip()) == 0 \
-        else "{base}/services/{folder}/{service}.{type}/{operation}"
-    url = url.format(
-        base = base_url,
-        service = service_name,
-        type = service_type,
-        operation = operation if not operation == None else "",
-        folder = folder_name)
-    return requests.Request(method, url)
-
 def send_session_request(session, request, ags_operation = True):
     """
     For whatever reason, the requests library doesn't use pre-configured authentication or paramater information on a
@@ -130,3 +94,6 @@ def decode_ags_operation(response, **kwargs):
         response.reason = JSON_DECODE_ERROR
 
     return response
+
+def get_server_url_base(protocol, hostname, port, instance):
+    return "{0}://{1}:{2}/{3}/admin".format(protocol, hostname, port, instance)

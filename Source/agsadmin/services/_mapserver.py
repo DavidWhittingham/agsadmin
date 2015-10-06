@@ -46,3 +46,19 @@ class _MapServer(_Service):
     @property
     def _url_base(self):
         return self._pdata["_url_base"]
+
+    @staticmethod
+    def _get_service_url(base_url, service_name, folder = None):
+        """
+        Constructs the full URL for a service endpoint.
+        
+        :param base_url: The base URL of the ArcGIS Server Admin API (usually 'http://serverName:port/instance_name/admin')
+        :type base_url: str
+        
+        :param service_name: The name of the service to perform an operation on.
+        :type service_name: str
+        
+        :param folder_name: If the service is not at the root level, specify the folder it resides in.
+        :type folder_name: str
+        """
+        return _Service._get_service_url(base_url, service_name, _SERVICE_TYPE, folder)

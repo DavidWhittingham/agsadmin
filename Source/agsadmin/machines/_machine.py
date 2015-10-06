@@ -8,11 +8,8 @@ class Machine(_EndpointBase):
     _pdata = {}
 
     def __init__(self, requests_session, server_url, machine_name):
-        self._pdata["_session"] = requests_session
+        super(Machine, self).__init__(requests_session, server_url)
         self._pdata["name"] = machine_name
-        self._pdata["_url_base"] = server_url
-        self._start_url = "{0}/machines/{1}/start".format(server_url, machine_name)
-        self._stop_url = "{0}/machines/{1}/stop".format(server_url, machine_name)
 
     ################
     ## PROPERTIES ##
@@ -22,12 +19,8 @@ class Machine(_EndpointBase):
         return self._pdata["name"]
 
     @property
-    def _session(self):
-        return self._pdata["_session"]
-
-    @property
-    def _url_base(self):
-        return self._pdata["_url_base"]
+    def _url_full(self):
+        return "{0}/machines/{1}".format(self._url_base, self.name)
 
     ####################
     ## PUBLIC METHODS ##
@@ -37,11 +30,11 @@ class Machine(_EndpointBase):
         Starts the ArcGIS Service.
         """
 
-        send_session_request(self._session, requests.Request("POST", self._start_url))
+        send_session_request(self._session, requests.Request("POST", "{0}/start".format(self._url_full)))
 
     def stop(self):
         """
         Stops the ArcGIS Service.
         """
 
-        send_session_request(self._session, requests.Request("POST", self._stop_url))
+        send_session_request(self._session, requests.Request("POST", "{0}/stop".format(self._url_full)))
