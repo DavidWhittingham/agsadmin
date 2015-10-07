@@ -13,12 +13,11 @@ class _MapServer(_Service):
 
     _pdata = {}
 
-    def __init__(self, requests_session, server_url, service_properties, service_name, folder_name = None):
+    def __init__(self, requests_session, server_url, service_name, folder = None):
         self._pdata["_session"] = requests_session
         self._pdata["name"] = service_name
-        self._pdata["folder"] = folder_name
+        self._pdata["folder"] = folder
         self._pdata["_url_base"] = server_url
-        self._properties = service_properties
 
     ################
     ## PROPERTIES ##
@@ -30,10 +29,6 @@ class _MapServer(_Service):
     @property
     def folder(self):
         return self._pdata["folder"]
-
-    @property
-    def properties(self):
-        return deepcopy(self._properties)
 
     @property
     def _session(self):
@@ -58,7 +53,7 @@ class _MapServer(_Service):
         :param service_name: The name of the service to perform an operation on.
         :type service_name: str
         
-        :param folder_name: If the service is not at the root level, specify the folder it resides in.
-        :type folder_name: str
+        :param folder: If the service is not at the root level, specify the name of the folder it resides in.
+        :type folder: str
         """
         return _Service._get_service_url(base_url, service_name, _SERVICE_TYPE, folder)

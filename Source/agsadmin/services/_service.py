@@ -2,25 +2,25 @@ import abc
 from copy import deepcopy
 from json import dumps
 
-from requests import Request
-
+from agsadmin.exceptions import UnknownServiceError, CommunicationError
 from agsadmin._utils import send_session_request
 from agsadmin._endpoint_base import _EndpointBase
+from ._permissions_mixin import _PermissionsMixin
 
 
-class _Service(_EndpointBase):
+class _Service(_PermissionsMixin, _EndpointBase):
     """
     Base class for all types of ArcGIS Server services. Implements the core operations supported by all services,
     and decribes abstract properties that need to be supported by all implementors.
     """
 
     __metaclass__ = abc.ABCMeta
-
-    _properties = None
     
     def __init__(self, session, url_base):
         super(_Service, self).__init__(session, url_base)
-        
+
+    def __str__(self):
+        return self.name
 
     ################
     ## PROPERTIES ##
@@ -36,13 +36,6 @@ class _Service(_EndpointBase):
     def folder(self):
         """
         Gets the folder the service is in ('None' for root folder).
-        """
-        return
-
-    @abc.abstractproperty
-    def properties(self):
-        """
-        Gets the properties (metadata) of the service.
         """
         return
     
@@ -61,17 +54,19 @@ class _Service(_EndpointBase):
     ####################
     ## PUBLIC METHODS ##
     ####################
-    def stop_service(self):
+    def get_iteminfo(self):
         """
-        Stops the ArcGIS Service.
+        Gets the item info (description, summary, tags, etc.) of the service.
         """
-        return send_session_request(self._session, self._create_operation_request(self._url_full, "stop")).json()
+        return send_session_request(self._session, self._create_operation_request(self._url_full, "iteminfo")).json()
 
-    def start_service(self):
+    def get_properties(self):
         """
-        Starts the ArcGIS Service.
+        Gets the properties of the service.
         """
-        return send_session_request(self._session, self._create_operation_request(self._url_full, "start")).json()
+        return send_session_request(
+            self._requests_session,
+            service_class._create_operation_request(self._url_full, method = "GET")).json()
 
     def get_statistics(self):
         """
@@ -85,11 +80,17 @@ class _Service(_EndpointBase):
         """
         return send_session_request(self._session, self._create_operation_request(self._url_full, "status")).json()
 
-    def get_iteminfo(self):
+    def stop_service(self):
         """
-        Gets the item info (description, summary, tags, etc.) of the service.
+        Stops the ArcGIS Service.
         """
-        return send_session_request(self._session, self._create_operation_request(self._url_full, "iteminfo")).json()
+        return send_session_request(self._session, self._create_operation_request(self._url_full, "stop")).json()
+
+    def start_service(self):
+        """
+        Starts the ArcGIS Service.
+        """
+        return send_session_request(self._session, self._create_operation_request(self._url_full, "start")).json()
 
     def set_iteminfo(self, new_info):
         """
@@ -107,29 +108,7 @@ class _Service(_EndpointBase):
         """
         r = self._create_operation_request(self._url_full, "edit")
         r.data = {"service": dumps(new_properties)}
-        response = send_session_request(self._session, r).json()
-
-        #self._properties set after HTTP request incase exception is thrown
-        self._properties = deepcopy(new_properties)
-        return response
-    
-    @staticmethod
-    def _create_operation_request(url, operation = None, method = "POST"):
-        """
-        Creates an operation request against a given ArcGIS Server Service.
-
-        :param url: The full URL of the service endpoint.
-        :type base_url: str
-
-        :param operation: The operation to perform.  If None, no operation is sent and the basic service metadata is
-            returned.
-        :type operation: str
-
-        :param method: Overrides the HTTP verb to use on the request, default is POST but some operations accept/require GET
-        :type method: str
-        """
-
-        return Request(method, "{endpoint}/{operation}".format(endpoint = url, operation = operation if operation else ""))
+        return send_session_request(self._session, r).json()
 
     @staticmethod
     def _get_service_url(base_url, service_name, service_type, folder = None):

@@ -1,5 +1,7 @@
 import abc
 
+from requests import Request
+
 class _EndpointBase(object):
     """
     Base class for all ArcGIS Server interactive endpoints.  Contains abstract items for dealing with service 
@@ -34,3 +36,23 @@ class _EndpointBase(object):
         Returns the full URL for this endpoint.
         """
         return
+
+    @staticmethod
+    def _create_operation_request(endpoint, operation = None, method = "POST"):
+        """
+        Creates an operation request against a given ArcGIS Server endpoint.
+
+        :param endpoint: The endpoint on which to perform the operation.
+        :type base_url: str or object implementing agsadmin._endpoint_base
+
+        :param operation: The operation to perform. If None, the endpoint metadata is returned.
+        :type operation: str
+
+        :param method: Overrides the HTTP verb to use on the request, default is POST but some operations 
+                       accept/require GET
+        :type method: str
+        """
+
+        return Request(method, "{endpoint}/{operation}".format(
+            endpoint = endpoint._url_full if isinstance(endpoint, _EndpointBase) else endpoint,
+            operation = operation if operation else ""))

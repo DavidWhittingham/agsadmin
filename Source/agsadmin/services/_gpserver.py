@@ -13,11 +13,10 @@ class _GpServer(_Service):
 
     _pdata = {}
 
-    def __init__(self, requests_session, server_url, service_properties, service_name, folder_name = None):
+    def __init__(self, requests_session, server_url, service_name, folder_name = None):
         super(_GpServer, self).__init__(requests_session, server_url)
         self._pdata["name"] = service_name
         self._pdata["folder"] = folder_name
-        self._properties = service_properties
 
     ################
     ## PROPERTIES ##
@@ -29,10 +28,6 @@ class _GpServer(_Service):
     @property
     def folder(self):
         return self._pdata["folder"]
-
-    @property
-    def properties(self):
-        return deepcopy(self._properties)
 
     @property
     def _type(self):
