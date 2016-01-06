@@ -68,7 +68,10 @@ def send_session_request(session, request, ags_operation = True):
     if ags_operation:
         hooks["response"] = decode_ags_operation
 
-    r = session.request(request.method, request.url, data = request.data, params = request.params, hooks = hooks)
+    if request.files:
+        r = session.request(request.method, request.url, data = request.data, files=request.files, params = request.params, hooks = hooks)
+    else:
+        r = session.request(request.method, request.url, data = request.data, params = request.params, hooks = hooks)
 
     r.raise_for_status()
     return r

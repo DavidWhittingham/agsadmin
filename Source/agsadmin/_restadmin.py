@@ -7,6 +7,7 @@ from .exceptions import InvalidServiceTypeError, UnknownServiceError, Communicat
 from ._utils import get_server_url_base, send_session_request
 
 import requests
+import os
 
 from datetime import timedelta
 
@@ -121,3 +122,35 @@ class RestAdmin(object):
     def get_machine(self, name):
         """Gets a machine proxy object by name."""
         return Machine(self._requests_session, self._server_url_base, name)
+
+    def upload_item(self, itemFile, description=""):
+        """
+        Uploads the specified file to ags
+        """
+        r = requests.Request("POST", "{0}/uploads/upload".format(self._server_url_base))
+        r.data = {"description": description}
+        r.files = {"itemFile": (os.path.basename(itemFile.name), itemFile)}
+        return send_session_request(self._requests_session, r).json()
+
+    def delete_uploaded_item(self, itemID):
+        """
+        Deletes an uploaded file from ags
+        """
+        r = requests.Request("POST", "{0}/uploads/{1}/delete".format(self._server_url_base, itemID))
+        return send_session_request(self._requests_session, r).json()
+
+    def unregister_extension(self, extension_name):
+        """
+        Unregisters the specified extension from ags
+        """
+        r = requests.Request("POST", "{0}/services/types/extensions/unregister".format(self._server_url_base))
+        r.data = {"extensionFilename": extension_name}
+        return send_session_request(self._requests_session, r).json()
+
+    def register_extension(self, itemID):
+        """
+        Registers the specified extension with ags
+        """
+        r = requests.Request("POST", "{0}/services/types/extensions/register".format(self._server_url_base))
+        r.data = {"id": itemID}
+        return send_session_request(self._requests_session, r).json()
