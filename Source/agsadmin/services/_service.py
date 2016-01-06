@@ -65,8 +65,8 @@ class _Service(_PermissionsMixin, _EndpointBase):
         Gets the properties of the service.
         """
         return send_session_request(
-            self._requests_session,
-            service_class._create_operation_request(self._url_full, method = "GET")).json()
+            self._session,
+            self._create_operation_request(self._url_full, method = "GET")).json()
 
     def get_statistics(self):
         """
