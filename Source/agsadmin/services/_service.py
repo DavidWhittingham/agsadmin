@@ -16,8 +16,15 @@ class _Service(_PermissionsMixin, _EndpointBase):
 
     __metaclass__ = abc.ABCMeta
     
-    def __init__(self, session, url_base):
+    _name = None
+    _folder = None
+    _type_str = None
+    
+    def __init__(self, session, url_base, name, folder, type_str):
         super(_Service, self).__init__(session, url_base)
+        self._name = name
+        self._folder = folder
+        self._type_str = type_str
 
     def __str__(self):
         return self.name
@@ -25,26 +32,26 @@ class _Service(_PermissionsMixin, _EndpointBase):
     ################
     ## PROPERTIES ##
     ################
-    @abc.abstractproperty
+    @property
     def name(self):
         """
         Gets the name of the service.
         """
-        return
+        return self._name
 
-    @abc.abstractproperty
+    @property
     def folder(self):
         """
         Gets the folder the service is in ('None' for root folder).
         """
-        return
+        return self._folder
     
-    @abc.abstractproperty
+    @property
     def _type(self):
         """
         Gets the type of this service
         """
-        return
+        return self._type_str
     
     @property
     def _url_full(self):
