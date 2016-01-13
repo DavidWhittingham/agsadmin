@@ -83,7 +83,7 @@ class RestAdmin(object):
     def delete_service(self, service_name, service_type, service_folder = None):
         serv_type = service_type.lower()
         if (serv_type in services._type_map):
-            url = services._type_map[serv_type]._get_service_url(self._server_url_base, service_name, service_folder)
+            url = services._type_map[serv_type]._get_service_url(self._server_url_base, service_name, service_type, service_folder)
             request = services._type_map[serv_type]._create_operation_request(url, operation = "delete", method = "POST")
 
             try:
