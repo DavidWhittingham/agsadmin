@@ -9,8 +9,8 @@ from ._utils import get_server_url_base, send_session_request
 import requests
 import os
 
-from datetime import timedelta
-
+from datetime import datetime
+from dateutil import tz
 
 class RestAdmin(object):
     """
@@ -25,7 +25,7 @@ class RestAdmin(object):
         return self._server_url_base
 
     def __init__(self, hostname, username, password, instance_name = "arcgis", port = 6080, use_ssl = False,
-                 utc_delta = timedelta(), proxies = None, encrypt = True):
+                 utc_delta = tz.tzlocal().utcoffset(datetime.now()), proxies = None, encrypt = True):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
