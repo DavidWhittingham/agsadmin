@@ -20,6 +20,7 @@ setup(
     
     #dependencies
     install_requires = [
+        "python-dateutil>=2.5.3",
         "rsa>=3.1.1",
         "requests>=1.2.0"
     ],
