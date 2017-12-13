@@ -1,17 +1,10 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
+from setuptools import setup, find_packages
 
 with open('agsadmin/_version.py') as fin: exec(fin)
+with open('requirements.txt') as fin: requirements=[s.strip() for s in fin.readlines()]
+with open('readme.rst') as fin: long_description = fin.read()
 
-packages = [
-    "agsadmin",
-    "agsadmin.exceptions",
-    "agsadmin.services",
-    "agsadmin.machines"
-]
+packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 	
 setup(
     name = "agsadmin",
@@ -19,11 +12,7 @@ setup(
     packages = packages,
     
     #dependencies
-    install_requires = [
-        "python-dateutil>=2.5.3",
-        "rsa>=3.1.1",
-        "requests>=1.2.0"
-    ],
+    install_requires = requirements,
     
     #misc files to include
     package_data = {
@@ -33,6 +22,7 @@ setup(
     #PyPI MetaData
     author = __author__,
     description = "ArcGIS Server REST Admin API Proxy",
+    long_description = long_description,
     license = "BSD 3-Clause",
     keywords = "arcgis esri",
     url = "https://github.com/DavidWhittingham/agsadmin",
