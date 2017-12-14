@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 with open('agsadmin/_version.py') as fin: exec(fin)
-with open('requirements.txt') as fin: requirements=[s.strip() for s in fin.readlines()]
-with open('readme.rst') as fin: long_description = fin.read()
+with open('requirements.txt') as fin: requirements = [s.strip() for s in fin.readlines()]
+with open('README.rst') as fin: long_description = fin.read()
 
 packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 	
