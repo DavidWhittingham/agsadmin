@@ -1,10 +1,16 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
+                      super, zip)
+
 from requests.exceptions import ConnectionError, HTTPError
 
 from . import services
-from .machines import Machine
+from .machines import Machines
 from ._auth import _RestAdminAuth
 from .exceptions import InvalidServiceTypeError, UnknownServiceError, CommunicationError
 from ._utils import get_server_url_base, send_session_request
+from .system import System
+from .services import Services
 
 import requests
 import os
@@ -23,6 +29,18 @@ class RestAdmin(object):
     @property
     def url(self):
         return self._server_url_base
+
+    @property
+    def system(self):
+        return self._system
+
+    @property
+    def machines(self):
+        return self._machines
+
+    @property
+    def services(self):
+        return self._services
 
     def __init__(self, hostname, username, password, instance_name = "arcgis", port = 6080, use_ssl = False,
                  utc_delta = tz.tzlocal().utcoffset(datetime.now()), proxies = None, encrypt = True):
@@ -65,6 +83,7 @@ class RestAdmin(object):
         :type encrypt: bool
         """
 
+        # setup the requests session
         self._server_url_base = get_server_url_base("https" if use_ssl else "http", hostname, port, instance_name)
         self._requests_session = requests.Session()
         self._requests_session.params = {"f": "json"}
@@ -80,50 +99,12 @@ class RestAdmin(object):
         if not proxies == None:
             self._requests_session.proxies = proxies
 
-    def delete_service(self, service_name, service_type, service_folder = None):
-        serv_type = service_type.lower()
-        if (serv_type in services._type_map):
-            url = services._type_map[serv_type]._get_service_url(self._server_url_base, service_name, service_type, service_folder)
-            request = services._type_map[serv_type]._create_operation_request(url, operation = "delete", method = "POST")
+        # setup sub-modules/classes
+        self._system = System(self._requests_session, self._server_url_base)
+        self._machines = Machines(self._requests_session, self._server_url_base)
+        self._services = Services(self._requests_session, self._server_url_base)
 
-            try:
-                response = send_session_request(self._requests_session, request).json()
-            except HTTPError as he:
-                if he.response.status_code == 404:
-                    raise UnknownServiceError()
-                else:
-                    raise CommunicationError()
-            except ConnectionError:
-                raise CommunicationError()
-        else:
-            raise InvalidServiceTypeError()
-
-    def get_service(self, service_name, service_type, service_folder = None):
-        """Gets a service proxy object by name, type and folder (optional).
-        Currently allowed service types are: MapServer, GpServer"""
-
-        service_folder = self.get_folder(service_folder)
-
-        serv_type = service_type.lower()
-        if (serv_type in services._type_map):
-            return services._type_map[serv_type](
-                        self._requests_session,
-                        self._server_url_base,
-                        service_name,
-                        service_folder)
-        else:
-            raise InvalidServiceTypeError()
-
-    def get_folder(self, service_folder):
-        if service_folder != None and not isinstance(service_folder, services._Folder):
-            service_folder = services._Folder(self._requests_session, self._server_url_base, service_folder)
-        return service_folder
-
-    def get_machine(self, name):
-        """Gets a machine proxy object by name."""
-        return Machine(self._requests_session, self._server_url_base, name)
-
-    def upload_item(self, itemFile, description=""):
+    def upload_item(self, itemFile, description = ""):
         """
         Uploads the specified file to ags
         """
@@ -132,11 +113,11 @@ class RestAdmin(object):
         r.files = {"itemFile": (os.path.basename(itemFile.name), itemFile)}
         return send_session_request(self._requests_session, r).json()
 
-    def delete_uploaded_item(self, itemID):
+    def delete_uploaded_item(self, item_id):
         """
         Deletes an uploaded file from ags
         """
-        r = requests.Request("POST", "{0}/uploads/{1}/delete".format(self._server_url_base, itemID))
+        r = requests.Request("POST", "{0}/uploads/{1}/delete".format(self._server_url_base, item_id))
         return send_session_request(self._requests_session, r).json()
 
     def unregister_extension(self, extension_name):
@@ -147,10 +128,10 @@ class RestAdmin(object):
         r.data = {"extensionFilename": extension_name}
         return send_session_request(self._requests_session, r).json()
 
-    def register_extension(self, itemID):
+    def register_extension(self, item_id):
         """
         Registers the specified extension with ags
         """
         r = requests.Request("POST", "{0}/services/types/extensions/register".format(self._server_url_base))
-        r.data = {"id": itemID}
+        r.data = {"id": item_id}
         return send_session_request(self._requests_session, r).json()

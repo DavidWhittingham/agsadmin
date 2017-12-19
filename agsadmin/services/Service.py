@@ -1,29 +1,32 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
+                      super, zip)
+
 import abc
-from copy import deepcopy
 from json import dumps
 
-from agsadmin.exceptions import UnknownServiceError, CommunicationError
-from agsadmin._utils import send_session_request
-from agsadmin._endpoint_base import _EndpointBase
+from .._utils import send_session_request
+from .._endpoint_base import _EndpointBase
 from ._permissions_mixin import _PermissionsMixin
+from .ServiceType import ServiceType
+from .Folder import Folder
 
-
-class _Service(_PermissionsMixin, _EndpointBase):
+class Service(_PermissionsMixin, _EndpointBase):
     """
     Base class for all types of ArcGIS Server services. Implements the core operations supported by all services,
     and decribes abstract properties that need to be supported by all implementors.
     """
 
     __metaclass__ = abc.ABCMeta
-    
+
     _name = None
     _folder = None
     _type_str = None
-    
-    def __init__(self, session, url_base, name, folder, type_str):
-        super(_Service, self).__init__(session, url_base)
+
+    def __init__(self, session, url_base, name, folder_name, type_str):
+        super().__init__(session, url_base)
         self._name = name
-        self._folder = folder
+        self._folder = Folder(session, url_base, folder_name) if folder_name != None else None
         self._type_str = type_str
 
     def __str__(self):
@@ -42,17 +45,17 @@ class _Service(_PermissionsMixin, _EndpointBase):
     @property
     def folder(self):
         """
-        Gets the folder the service is in ('None' for root folder).
+        Gets the folder the service is in ('None' if service is in the root folder).
         """
         return self._folder
-    
+
     @property
     def _type(self):
         """
         Gets the type of this service
         """
         return self._type_str
-    
+
     @property
     def _url_full(self):
         # Use _Service rather than self because method is possibly overridden
@@ -61,6 +64,9 @@ class _Service(_PermissionsMixin, _EndpointBase):
     ####################
     ## PUBLIC METHODS ##
     ####################
+    def delete(self):
+        return send_session_request(self._session, self._create_operation_request(self, "delete")).json()
+
     def get_iteminfo(self):
         """
         Gets the item info (description, summary, tags, etc.) of the service.
@@ -101,7 +107,7 @@ class _Service(_PermissionsMixin, _EndpointBase):
 
     def set_iteminfo(self, new_info):
         """
-        Sets the item info (description, summary, tags, etc.) for the service.  Note that this will completely 
+        Sets the item info (description, summary, tags, etc.) for the service.  Note that this will completely
         overwrite the existing item info, so make sure all attributes are included.
         """
         r = self._create_operation_request(self._url_full,  "iteminfo/edit")
@@ -121,16 +127,16 @@ class _Service(_PermissionsMixin, _EndpointBase):
     def _get_service_url(base_url, service_name, service_type, folder = None):
         """
         Constructs the full URL for a service endpoint.
-        
+
         :param base_url: The base URL of the ArcGIS Server Admin API (usually 'http://serverName:port/instance_name/admin')
         :type base_url: str
-        
+
         :param service_name: The name of the service to perform an operation on.
         :type service_name: str
 
         :param service_type: The type of the service named in the "service_name" property.
         :type service_type: str
-        
+
         :param folder_name: If the service is not at the root level, specify the folder it resides in.
         :type folder_name: str
         """
@@ -140,3 +146,15 @@ class _Service(_PermissionsMixin, _EndpointBase):
                 name = service_name,
                 type = service_type
             )
+
+    @staticmethod
+    def _create_from_json(service_json, session, url_base):
+        service_enum = ServiceType(service_json["type"])
+        service_name = service_json["serviceName"]
+        folder_name = service_json["folderName"] if service_json["folderName"] != "/" else None
+
+        return ServiceType._get_proxy(service_enum)(
+                        session,
+                        url_base,
+                        service_name,
+                        folder_name)

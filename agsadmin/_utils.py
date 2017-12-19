@@ -1,4 +1,10 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
+                      super, zip)
+
 import requests
+
+from rsa import PublicKey, encrypt
 
 JSON_DECODE_ERROR = "Unknown server response, error parsing server response as JSON."
 
@@ -40,18 +46,8 @@ def encrypt_request_data(data_dict, key, modulus):
     :rtype: Dict
     """
 
-    # get crypto module, then encode
-    try:
-        from rsa import PublicKey, encrypt
-        rpk = PublicKey(modulus, key)
-        new_data = {key: encrypt(value, rpk).encode('hex') for key, value in data_dict.iteritems()}
-    except ImportError:
-        from Crypto.PublicKey import RSA
-        from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
-        cipher = PKCS1_v1_5.new(RSA.construct((modulus, key)))
-        new_data = {key: cipher.encrypt(value).encode('hex') for key, value in data_dict.iteritems()}
-
-    return new_data
+    rpk = PublicKey(modulus, key)
+    return {key: encrypt(bytes(value, "utf-8"), rpk).encode('hex') for key, value in data_dict.iteritems()}
 
 def send_session_request(session, request, ags_operation = True):
     """
@@ -63,15 +59,14 @@ def send_session_request(session, request, ags_operation = True):
     :type session: requests.session
     """
 
-    hooks = {}
-
     if ags_operation:
-        hooks["response"] = decode_ags_operation
+        if "response" in request.hooks:
+            request.hooks["response"].append(decode_ags_operation)
+        else:
+            request.hooks["response"] = [decode_ags_operation]
 
-    if request.files:
-        r = session.request(request.method, request.url, data = request.data, files=request.files, params = request.params, hooks = hooks)
-    else:
-        r = session.request(request.method, request.url, data = request.data, params = request.params, hooks = hooks)
+    prepped = session.prepare_request(request)
+    r = session.send(prepped)
 
     r.raise_for_status()
     return r

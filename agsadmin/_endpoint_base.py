@@ -1,21 +1,27 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
+                      super, zip)
+
 import abc
 
 from requests import Request
 
+from ._utils import send_session_request
+
 class _EndpointBase(object):
     """
-    Base class for all ArcGIS Server interactive endpoints.  Contains abstract items for dealing with service 
+    Base class for all ArcGIS Server interactive endpoints.  Contains abstract items for dealing with service
     communication.
     """
-    
+
     __metaclass__ = abc.ABCMeta
-    
-    _endpoint_base_data = {}
-    
+
     def __init__(self, session, url_base):
-        self._endpoint_base_data["_session"] = session
-        self._endpoint_base_data["_url_base"] = url_base
-    
+        self._endpoint_base_data = {
+            "_session": session,
+            "_url_base": url_base
+        }
+
     @property
     def _session(self):
         """
@@ -29,7 +35,7 @@ class _EndpointBase(object):
         Returns the base URL for this instance of ArcGIS Server.
         """
         return self._endpoint_base_data["_url_base"]
-        
+
     @abc.abstractproperty
     def _url_full(self):
         """
@@ -37,8 +43,13 @@ class _EndpointBase(object):
         """
         return
 
+    def _get(self):
+        return send_session_request(
+            self._session,
+            self._create_operation_request(self, method = "GET")).json()
+
     @staticmethod
-    def _create_operation_request(endpoint, operation = None, method = "POST"):
+    def _create_operation_request(endpoint, operation = None, method = "POST", data = None):
         """
         Creates an operation request against a given ArcGIS Server endpoint.
 
@@ -48,11 +59,16 @@ class _EndpointBase(object):
         :param operation: The operation to perform. If None, the endpoint metadata is returned.
         :type operation: str
 
-        :param method: Overrides the HTTP verb to use on the request, default is POST but some operations 
+        :param method: Overrides the HTTP verb to use on the request, default is POST but some operations
                        accept/require GET
         :type method: str
         """
 
-        return Request(method, "{endpoint}/{operation}".format(
-            endpoint = endpoint._url_full if isinstance(endpoint, _EndpointBase) else endpoint,
-            operation = operation if operation else ""))
+        return Request(
+            method,
+            "{endpoint}/{operation}".format(
+                endpoint = endpoint._url_full if isinstance(endpoint, _EndpointBase) else endpoint,
+                operation = operation if operation else ""
+            ),
+            data = data
+        )

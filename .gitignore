@@ -40,3 +40,5 @@ nosetests.xml
 
 # Esri Products
 *.lock
+/.cache
+/.vscode

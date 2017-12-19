@@ -1,3 +1,7 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
+                      super, zip)
+
 import sys
 import agsadmin
 
@@ -5,32 +9,21 @@ import pytest
 
 from json import loads
 
-@pytest.mark.parametrize(("data", "rsa_key", "modulus", "use_pycrypto"), [
+@pytest.mark.parametrize(("data", "rsa_key", "modulus"), [
     ({"key1": "value1", "key2": "value2", "key3": "value3"}, 
      long("06DE8", 16),
-     long("AD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A", 16),
-     True),
+     long("AD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A", 16)),
     ({"key1": "value1", "key2": "value2", "key3": "value3"}, 
      long("06DE8", 16),
-     long("AD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A", 16),
-     False)
+     long("AD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A", 16))
 ])
-def test_encrypt_request_data_rsa(data, rsa_key, modulus, use_pycrypto):
+def test_encrypt_request_data_rsa(data, rsa_key, modulus):
     """
     Tests that a dictionary that is submitted for encryption returns with the correct fields, and that the values 
     'look' encrypted (i.e. are modified).  It doesn't test the encryption algorithm itself.
-
-    :param use_pycrypto: If set to true, blocks Python-RSA from importing, forcing the fallback to PyCrypto
-    :type use_pycrypto: bool
     """
 
-    if use_pycrypto == True:
-        sys.modules["rsa"] = None
-
     encrypted_data = agsadmin._utils.encrypt_request_data(data, rsa_key, modulus)
-
-    if use_pycrypto == True:
-        del sys.modules["rsa"]
 
     assert len(set(data.keys()) - set(encrypted_data.keys())) == 0
 

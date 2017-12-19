@@ -19,6 +19,15 @@ Features
 
   - start and stop
 
+- System
+
+  - Directories
+
+    - list directories
+    - register new directories
+    - unregister directories
+    - clean directories
+
 These functions can be used to automate management of ArcGIS Services (e.g. start/stop services on a schedule, 
 start/stop services to perform maintenance on associated datasets, etc.)
 
