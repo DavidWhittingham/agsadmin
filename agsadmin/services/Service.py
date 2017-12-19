@@ -58,8 +58,8 @@ class Service(_PermissionsMixin, _EndpointBase):
 
     @property
     def _url_full(self):
-        # Use _Service rather than self because method is possibly overridden
-        return _Service._get_service_url(self._url_base, self.name, self._type, self.folder)
+        # Use Service rather than self because method is possibly overridden
+        return Service._get_service_url(self._url_base, self.name, self._type, self.folder)
 
     ####################
     ## PUBLIC METHODS ##
