@@ -148,10 +148,9 @@ class Service(_PermissionsMixin, _EndpointBase):
             )
 
     @staticmethod
-    def _create_from_json(service_json, session, url_base):
+    def _create_from_json(service_json, session, url_base, folder_name):
         service_enum = ServiceType(service_json["type"])
         service_name = service_json["serviceName"]
-        folder_name = service_json["folderName"] if service_json["folderName"] != "/" else None
 
         return ServiceType._get_proxy(service_enum)(
                         session,

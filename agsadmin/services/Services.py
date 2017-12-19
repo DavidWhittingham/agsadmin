@@ -37,7 +37,7 @@ class Services(_EndpointBase):
 
         services = []
         for s in response["services"]:
-            services.append(Service._create_from_json(s, self._session, self._url_base))
+            services.append(Service._create_from_json(s, self._session, self._url_base, s["folderName"]))
 
         return services
 
@@ -66,4 +66,4 @@ class Services(_EndpointBase):
             self._session,
             self._create_operation_request(url, method = "GET")).json()
 
-        return Service._create_from_json(service_response, self._session, self._url_base)
+        return Service._create_from_json(service_response, self._session, self._url_base, folder_name)
