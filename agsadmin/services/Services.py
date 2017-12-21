@@ -7,11 +7,18 @@ from .._utils import send_session_request
 from .Folder import Folder
 from .Service import Service
 from .ServiceType import ServiceType
+from .types import Types
 
 class Services(_EndpointBase):
 
     def __init__(self, requests_session, server_url):
         super().__init__(requests_session, server_url)
+
+        self._types = Types(requests_session, server_url)
+
+    @property
+    def types(self):
+        return self._types
 
     @property
     def _url_full(self):
