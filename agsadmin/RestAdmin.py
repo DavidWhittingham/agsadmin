@@ -11,9 +11,9 @@ from .exceptions import InvalidServiceTypeError, UnknownServiceError, Communicat
 from ._utils import get_server_url_base, send_session_request
 from .system import System
 from .services import Services
+from .uploads import Uploads
 
 import requests
-import os
 
 from datetime import datetime
 from dateutil import tz
@@ -41,6 +41,10 @@ class RestAdmin(object):
     @property
     def services(self):
         return self._services
+
+    @property
+    def uploads(self):
+        return self._uploads
 
     def __init__(self, hostname, username, password, instance_name = "arcgis", port = 6080, use_ssl = False,
                  utc_delta = tz.tzlocal().utcoffset(datetime.now()), proxies = None, encrypt = True):
@@ -103,35 +107,4 @@ class RestAdmin(object):
         self._system = System(self._requests_session, self._server_url_base)
         self._machines = Machines(self._requests_session, self._server_url_base)
         self._services = Services(self._requests_session, self._server_url_base)
-
-    def upload_item(self, itemFile, description = ""):
-        """
-        Uploads the specified file to ags
-        """
-        r = requests.Request("POST", "{0}/uploads/upload".format(self._server_url_base))
-        r.data = {"description": description}
-        r.files = {"itemFile": (os.path.basename(itemFile.name), itemFile)}
-        return send_session_request(self._requests_session, r).json()
-
-    def delete_uploaded_item(self, item_id):
-        """
-        Deletes an uploaded file from ags
-        """
-        r = requests.Request("POST", "{0}/uploads/{1}/delete".format(self._server_url_base, item_id))
-        return send_session_request(self._requests_session, r).json()
-
-    def unregister_extension(self, extension_name):
-        """
-        Unregisters the specified extension from ags
-        """
-        r = requests.Request("POST", "{0}/services/types/extensions/unregister".format(self._server_url_base))
-        r.data = {"extensionFilename": extension_name}
-        return send_session_request(self._requests_session, r).json()
-
-    def register_extension(self, item_id):
-        """
-        Registers the specified extension with ags
-        """
-        r = requests.Request("POST", "{0}/services/types/extensions/register".format(self._server_url_base))
-        r.data = {"id": item_id}
-        return send_session_request(self._requests_session, r).json()
+        self._uploads = Uploads(self._requests_session, self._server_url_base)
