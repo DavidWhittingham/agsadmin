@@ -29,7 +29,7 @@ class Directories(_EndpointBase):
         response = self._get()
 
         directories = []
-        for d in response["directories"]:
+        for dir_json in response["directories"]:
             directories.append(Directory._create_from_json(dir_json, self._session, self._url_base))
 
         return directories
