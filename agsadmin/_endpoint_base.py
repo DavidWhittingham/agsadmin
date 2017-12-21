@@ -49,7 +49,7 @@ class _EndpointBase(object):
             self._create_operation_request(self, method = "GET")).json()
 
     @staticmethod
-    def _create_operation_request(endpoint, operation = None, method = "POST", data = None):
+    def _create_operation_request(endpoint, operation = None, method = "POST", data = None, files = None):
         """
         Creates an operation request against a given ArcGIS Server endpoint.
 
@@ -70,5 +70,6 @@ class _EndpointBase(object):
                 endpoint = endpoint._url_full if isinstance(endpoint, _EndpointBase) else endpoint,
                 operation = operation if operation else ""
             ),
-            data = data
+            data = data,
+            files = files
         )
