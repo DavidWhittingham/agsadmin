@@ -9,7 +9,8 @@ with open('agsadmin/_version.py') as fin: exec(fin)
 packages = [
     "agsadmin",
     "agsadmin.exceptions",
-    "agsadmin.services"
+    "agsadmin.services",
+    "agsadmin.machines"
 ]
 	
 setup(
@@ -19,6 +20,7 @@ setup(
     
     #dependencies
     install_requires = [
+        "python-dateutil>=2.5.3",
         "rsa>=3.1.1",
         "requests>=1.2.0"
     ],

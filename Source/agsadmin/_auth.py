@@ -6,7 +6,7 @@ from ._utils import get_public_key, encrypt_request_data
 
 class _RestAdminAuth(requests.auth.AuthBase):
     """Attaches ArcGIS REST Admin API Token to the given Request object."""
-    
+
     _get_public_key_url = None
     _get_token_url = None
     _username = None
@@ -16,11 +16,11 @@ class _RestAdminAuth(requests.auth.AuthBase):
     _expiration = None
 
     def __init__(self, username, password, get_token_url, utc_delta = timedelta(), expiration_minutes = 15, get_public_key_url = None, proxies = None):
-        """Authorization agent for attching the ArcGIS Server REST Admin API Token to each request sent to an ArcGIS 
+        """Authorization agent for attching the ArcGIS Server REST Admin API Token to each request sent to an ArcGIS
         Server instance.
 
-        :param utc_delta: Describes the time differential from UTC (plus/minus) the ArcGIS Server is.  
-            This is used to calculate when the server token has expired, as ArcGIS Server returns the timeout number 
+        :param utc_delta: Describes the time differential from UTC (plus/minus) the ArcGIS Server is.
+            This is used to calculate when the server token has expired, as ArcGIS Server returns the timeout number
             in local server time, not UTC.
         :type utc_delta: str
 
@@ -39,13 +39,13 @@ class _RestAdminAuth(requests.auth.AuthBase):
         self._get_token_url = get_token_url;
         self._expiration = expiration_minutes
         self._proxies = proxies
-        
+
     def __call__(self, r):
         # modify and return the request
         url_parts = urlparse(r.url)
         qs_args = parse_qs(url_parts[4])
         qs_args.update({"token": self._GetToken()})
-        
+
         new_qs = urlencode(qs_args, True)
 
         r.url = urlunparse(list(url_parts[0:4]) + [new_qs] + list(url_parts[5:]))
@@ -54,8 +54,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
 
 
     def _GetToken(self):
-        if (self._token == None) or ((self._token["expires"] - timedelta(seconds = 30)) <= datetime.utcnow() + self._utc_delta):
-
+        if (self._token == None) or ((self._token["expires"] - timedelta(seconds = 30)) <= (datetime.utcnow() + self._utc_delta)):
             req_data = {
                 "username": self._username,
                 "password": self._password,
@@ -75,8 +74,8 @@ class _RestAdminAuth(requests.auth.AuthBase):
                 })
 
             tk = requests.request("POST", self._get_token_url, data = req_data, proxies = self._proxies).json()
-
             tk["expires"] = datetime.fromtimestamp(int(tk["expires"]) / 1000)
+
             self._token = tk
 
         return self._token["token"]

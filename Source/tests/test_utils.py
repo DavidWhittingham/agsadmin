@@ -37,30 +37,6 @@ def test_encrypt_request_data_rsa(data, rsa_key, modulus, use_pycrypto):
     for key, value in data.iteritems():
         assert value != encrypted_data[key]
 
-
-@pytest.mark.parametrize(("base_url", "service_name", "service_type", "operation", "folder_name", "method", "exceptected_url"), [
-    ("http://arcgisserver:6080/arcgis/admin", "fake_service", "MapServer", None, None, None, 
-     "http://arcgisserver:6080/arcgis/admin/services/fake_service.MapServer/"),
-    ("http://arcgisserver:6080/arcgis/admin", "fake_service", "MapServer", "Start", None, None, 
-     "http://arcgisserver:6080/arcgis/admin/services/fake_service.MapServer/Start"),
-    ("http://arcgisserver:6080/arcgis/admin", "fake_service", "MapServer", "Start", "FakeFolder", None, 
-     "http://arcgisserver:6080/arcgis/admin/services/FakeFolder/fake_service.MapServer/Start"),
-    ("http://arcgisserver:6080/arcgis/admin", "fake_service", "MapServer", "Start", "FakeFolder", "GET", 
-     "http://arcgisserver:6080/arcgis/admin/services/FakeFolder/fake_service.MapServer/Start")
-])
-def test_create_operation_request(base_url, service_name, service_type, operation, folder_name, method, exceptected_url):
-    """
-    Tests the create operation request function, primarily to ensure that URL's are formed correctly based on input 
-    parameters.
-    """
-
-    opr = agsadmin._utils.create_operation_request(base_url, service_name, service_type, operation, folder_name, method)
-    if method == None:
-        method == "POST"
-
-    assert opr.url == exceptected_url
-    assert opr.method == method
-
 def test_decode_ags_operation():
     """
     Tests to ensure that ArcGIS Server JSON that indicates faults is correctly decoded, and raises the appropriate 
