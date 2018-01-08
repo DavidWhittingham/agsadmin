@@ -6,7 +6,7 @@ from enum import Enum
 
 class ServiceType(Enum):
     MAP_SERVER = "MapServer"
-    GP_SERVER = "GpServer"
+    GP_SERVER = "GPServer"
     IMAGE_SERVER = "ImageServer"
     GEOCODE_SERVER = "GeocodeServer"
 
