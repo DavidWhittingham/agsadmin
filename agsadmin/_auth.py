@@ -40,7 +40,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
         self._username = username
         self._password = password
         self._utc_delta = utc_delta
-        self._get_token_url = get_token_url;
+        self._get_token_url = get_token_url
         self._expiration = expiration_minutes
         self._proxies = proxies
 
@@ -49,22 +49,23 @@ class _RestAdminAuth(requests.auth.AuthBase):
         url_parts = urlparse(r.url)
         qs_args = parse_qs(url_parts[4])
         qs_args.update({"token": self._GetToken()})
-
         new_qs = urlencode(qs_args, True)
 
         r.url = urlunparse(list(url_parts[0:4]) + [new_qs] + list(url_parts[5:]))
-
         return r
-
 
     def _GetToken(self):
         if (self._token == None) or ((self._token["expires"] - timedelta(seconds = 30)) <= (datetime.utcnow() + self._utc_delta)):
             req_data = {
                 "username": self._username,
                 "password": self._password,
-                "client":  "requestip",
-                "expiration": str(self._expiration)
+                "expiration": str(self._expiration),
+                "client":  "referer",
+                "referer":  "https://dnrme-scs-np.esriaustraliaonline.com.au",
             }
+
+			# TODO
+            # "client":  "requestip",
 
             if not self._get_public_key_url == None:
                 pk = get_public_key(self._get_public_key_url)

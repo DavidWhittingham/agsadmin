@@ -5,7 +5,6 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 import abc
 
 from requests import Request
-
 from ._utils import send_session_request
 
 class _EndpointBase(object):
@@ -63,7 +62,6 @@ class _EndpointBase(object):
                        accept/require GET
         :type method: str
         """
-
         return Request(
             method,
             "{endpoint}/{operation}".format(

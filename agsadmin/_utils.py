@@ -3,6 +3,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 import requests
+import os
 
 from rsa import PublicKey, encrypt
 
@@ -66,6 +67,11 @@ def send_session_request(session, request, ags_operation = True):
             request.hooks["response"] = [decode_ags_operation]
 
     prepped = session.prepare_request(request)
+
+    if (os.environ.get('DEBUG')):
+        print(session.proxies)
+        print(request.method, prepped.url)
+
     r = session.send(prepped)
 
     r.raise_for_status()
@@ -93,5 +99,16 @@ def decode_ags_operation(response, **kwargs):
 
     return response
 
+def get_server_info_url(protocol, hostname, port, instance):
+    return "{0}://{1}{2}/{3}/rest/info".format(
+        protocol, 
+        hostname, 
+        "" if port == 80 else ":%s" % port, 
+        instance)
+
 def get_server_url_base(protocol, hostname, port, instance):
-    return "{0}://{1}:{2}/{3}/admin".format(protocol, hostname, port, instance)
+    return "{0}://{1}{2}/{3}/admin".format(
+        protocol, 
+        hostname, 
+        "" if port == 80 else ":%s" % port, 
+        instance)

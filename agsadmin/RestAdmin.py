@@ -8,12 +8,13 @@ from . import services
 from .machines import Machines
 from ._auth import _RestAdminAuth
 from .exceptions import InvalidServiceTypeError, UnknownServiceError, CommunicationError
-from ._utils import get_server_url_base, send_session_request
+from ._utils import get_server_url_base, send_session_request, get_server_info_url
 from .system import System
 from .services import Services
 from .uploads import Uploads
 
 import requests
+import os
 
 from datetime import datetime
 from dateutil import tz
@@ -46,8 +47,15 @@ class RestAdmin(object):
     def uploads(self):
         return self._uploads
 
-    def __init__(self, hostname, username, password, instance_name = "arcgis", port = 6080, use_ssl = False,
-                 utc_delta = tz.tzlocal().utcoffset(datetime.now()), proxies = None, encrypt = True):
+    def __init__(self, 
+        hostname, 
+        username, 
+        password, 
+        instance_name = "arcgis", 
+        port = 6080, 
+        use_ssl = False, utc_delta = tz.tzlocal().utcoffset(datetime.now()), 
+        proxies = None,
+        encrypt = True):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
@@ -86,22 +94,48 @@ class RestAdmin(object):
         parameter is ignored, as SSL will already encrypt the traffic.
         :type encrypt: bool
         """
+        
+        protocol = "https" if use_ssl else "http"
+
+        # Resolve proxy from env vars 
+        if proxies is None and ((os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY'))):
+            proxies = {
+                'http': os.environ.get('HTTP_PROXY'),
+                'https': os.environ.get('HTTPS_PROXY'),
+            }
+            print("Proxy enabled:", proxies)
+
+        # Resolve the generate token endpoint from /arcgis/rest/info 
+        useTokenAuth = False 
+        generateTokenUrl = None
+
+        agsInfo = requests.request(
+            "GET", 
+            get_server_info_url(protocol, hostname, port, instance_name), 
+            params={"f":"json"},
+            proxies = proxies).json()
+
+        if "authInfo" in agsInfo and "isTokenBasedSecurity" in agsInfo["authInfo"]:
+            generateTokenUrl = agsInfo["authInfo"]["tokenServicesUrl"]
+            useTokenAuth = True 
 
         # setup the requests session
-        self._server_url_base = get_server_url_base("https" if use_ssl else "http", hostname, port, instance_name)
+        self._server_url_base = get_server_url_base(protocol, hostname, port, instance_name)
         self._requests_session = requests.Session()
+        self._requests_session.proxies = proxies
         self._requests_session.params = {"f": "json"}
-        self._requests_session.auth = _RestAdminAuth(
-            username,
-            password,
-            self._server_url_base + "/generateToken",
-            utc_delta = utc_delta,
-            get_public_key_url = self._server_url_base + "/publicKey" \
-                if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
-            proxies = proxies)
 
-        if not proxies == None:
-            self._requests_session.proxies = proxies
+        # setup token auth (if required)
+        if useTokenAuth:
+            self._requests_session.auth = _RestAdminAuth(
+                username,
+                password,
+                generateTokenUrl, 
+                utc_delta = utc_delta,
+                get_public_key_url = self._server_url_base + "/publicKey" \
+                    if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
+                proxies = proxies
+                )
 
         # setup sub-modules/classes
         self._system = System(self._requests_session, self._server_url_base)
