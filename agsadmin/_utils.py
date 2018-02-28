@@ -107,7 +107,7 @@ def get_server_info_url(protocol, hostname, port, instance):
         instance)
 
 def get_server_url_base(protocol, hostname, port, instance):
-    return "{0}://{1}{2}/{3}/admin".format(
+    return "{0}://{1}{2}/{3}".format(
         protocol, 
         hostname, 
         "" if port == 80 else ":%s" % port, 
