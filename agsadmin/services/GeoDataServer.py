@@ -4,11 +4,11 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from .Service import Service
 
-_SERVICE_TYPE = "GPServer"
+_SERVICE_TYPE = "GeoDataServer"
 
-class GpServer(Service):
+class GeoDataServer(Service):
     """
-    A class representing ArcGIS Server Geoprocessing services.
+    A class representing ArcGIS Server GeoData services.
     
     Allows you to perfrom typical administrative functions on the service.
     """
