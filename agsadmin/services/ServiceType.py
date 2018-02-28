@@ -9,6 +9,7 @@ class ServiceType(Enum):
     GP_SERVER = "GPServer"
     IMAGE_SERVER = "ImageServer"
     GEOCODE_SERVER = "GeocodeServer"
+    GEO_DATA_SERVER = "GeoDataServer"
 
     @staticmethod
     def _get_proxy(service_type):
@@ -16,12 +17,14 @@ class ServiceType(Enum):
         from .GpServer import GpServer
         from .ImageServer import ImageServer
         from .GeocodeServer import GeocodeServer
+        from .GeoDataServer import GeoDataServer
 
         _type_map = {
             ServiceType.MAP_SERVER: MapServer,
             ServiceType.GP_SERVER: GpServer,
             ServiceType.IMAGE_SERVER: ImageServer,
-            ServiceType.GEOCODE_SERVER: GeocodeServer
+            ServiceType.GEOCODE_SERVER: GeocodeServer,
+            ServiceType.GEO_DATA_SERVER: GeoDataServer
         }
 
         service_type = ServiceType(service_type)
