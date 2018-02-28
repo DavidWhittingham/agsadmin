@@ -4,7 +4,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from .Service import Service
 
-_SERVICE_TYPE = "GpServer"
+_SERVICE_TYPE = "GPServer"
 
 class GpServer(Service):
     """
