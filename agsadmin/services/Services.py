@@ -51,7 +51,7 @@ class Services(_EndpointBase):
     def get_folder(self, name):
         response = self._get()
 
-        for f in response("foldersDetail"):
+        for f in response["foldersDetail"]:
             if f["folderName"].lower() == name.lower():
                 return Folder._create_from_json(f, self._session, self._url_base)
 
