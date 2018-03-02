@@ -66,13 +66,13 @@ class _RestAdminAuth(requests.auth.AuthBase):
         # modify and return the request
         url_parts = urlparse(r.url)
         qs_args = parse_qs(url_parts[4])
-        qs_args.update({"token": self._GetToken()})
+        qs_args.update({"token": self._get_token()})
         new_qs = urlencode(qs_args, True)
 
         r.url = urlunparse(list(url_parts[0:4]) + [new_qs] + list(url_parts[5:]))
         return r
 
-    def _GetToken(self):
+    def _get_token(self):
         if (self._token == None) or ((self._token["expires"] - timedelta(seconds=30)) <= (datetime.utcnow() + self._utc_delta)):
             req_data = {
                 "username": self._username,

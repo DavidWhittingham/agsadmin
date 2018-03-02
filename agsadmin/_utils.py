@@ -3,12 +3,10 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 import requests
-import os
 
 from rsa import PublicKey, encrypt
 
 JSON_DECODE_ERROR = "Unknown server response, error parsing server response as JSON."
-
 
 def get_public_key(public_key_url):
     """
@@ -25,7 +23,6 @@ def get_public_key(public_key_url):
     r["publicKey"] = long(r["publicKey"], 16)
     r["modulus"] = long(r["modulus"], 16)
     return r
-
 
 def encrypt_request_data(data_dict, key, modulus):
     """
@@ -52,7 +49,6 @@ def encrypt_request_data(data_dict, key, modulus):
     rpk = PublicKey(modulus, key)
     return {key: encrypt(bytes(value, "utf-8"), rpk).encode('hex') for key, value in data_dict.iteritems()}
 
-
 def send_session_request(session, request, ags_operation=True):
     """
     For whatever reason, the requests library doesn't use pre-configured authentication or paramater information on a
@@ -76,7 +72,6 @@ def send_session_request(session, request, ags_operation=True):
     r.raise_for_status()
     return r
 
-
 def decode_ags_operation(response, **kwargs):
     """
     Because Esri don't know how to write a REST service correctly (i.e. one that uses HTTP error codes in the response
@@ -99,14 +94,12 @@ def decode_ags_operation(response, **kwargs):
 
     return response
 
-
 def get_server_info_url(protocol, hostname, port, instance):
     return "{0}://{1}{2}/{3}/rest/info".format(
         protocol,
         hostname,
         "" if port == 80 else ":%s" % port,
         instance)
-
 
 def get_server_url_base(protocol, hostname, port, instance):
     return "{0}://{1}{2}/{3}".format(
