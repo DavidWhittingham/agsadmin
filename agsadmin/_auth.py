@@ -22,6 +22,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
     _expiration = None
     _client = None
     _referer = None
+    _ip = None 
 
     def __init__(self,
                  username,
@@ -32,7 +33,8 @@ class _RestAdminAuth(requests.auth.AuthBase):
                  get_public_key_url=None,
                  proxies=None,
                  client=None,
-                 referer=None):
+                 referer=None,
+                 ip=None):
         """Authorization agent for attching the ArcGIS Server REST Admin API Token to each request sent to an ArcGIS
         Server instance.
 
@@ -58,6 +60,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
         self._proxies = proxies
         self._client = client
         self._referer = referer
+        self._ip = ip
 
     def __call__(self, r):
         # modify and return the request
@@ -66,8 +69,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
         qs_args.update({"token": self._GetToken()})
         new_qs = urlencode(qs_args, True)
 
-        r.url = urlunparse(
-            list(url_parts[0:4]) + [new_qs] + list(url_parts[5:]))
+        r.url = urlunparse(list(url_parts[0:4]) + [new_qs] + list(url_parts[5:]))
         return r
 
     def _GetToken(self):
@@ -76,14 +78,22 @@ class _RestAdminAuth(requests.auth.AuthBase):
                 "username": self._username,
                 "password": self._password,
                 "expiration": str(self._expiration),
-                "client":  self._client,
-                "referer":  self._referer
+                "client":  self._client
             }
+
+            if (self._client == "ip"):
+                 req_data.update({
+                    "ip": self._ip
+                })
+
+            if (self._client == "referer"):
+                 req_data.update({
+                    "referer": self._referer
+                })
 
             if not self._get_public_key_url == None:
                 pk = get_public_key(self._get_public_key_url)
-                req_data = encrypt_request_data(
-                    req_data, pk["publicKey"], pk["modulus"])
+                req_data = encrypt_request_data(req_data, pk["publicKey"], pk["modulus"])
                 req_data.update({
                     "encrypted": "true"
                 })
@@ -92,7 +102,23 @@ class _RestAdminAuth(requests.auth.AuthBase):
                 "f": "json"
             })
 
-            tk = requests.request("POST", self._get_token_url, data=req_data, proxies=self._proxies, verify=False).json()
+            # print(req_data)
+
+            r = requests.request("POST",
+                                 self._get_token_url,
+                                 data=req_data,
+                                 proxies=self._proxies,
+                                 verify=False)
+
+            if (not r.status_code == 200):
+                print(tk)
+                raise Exception("Error getting token")
+
+            tk = r.json()
+
+            if ("error" in tk):
+                raise Exception(tk["error"])
+
             tk["expires"] = datetime.fromtimestamp(int(tk["expires"]) / 1000)
 
             self._token = tk

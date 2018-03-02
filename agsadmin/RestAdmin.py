@@ -29,7 +29,7 @@ class RestAdmin(object):
     _server_url_base = None
     _server_url_rest_base = None
     _requests_session = None
-    _proxies = None 
+    _proxies = None
 
     @property
     def url(self):
@@ -123,8 +123,9 @@ class RestAdmin(object):
             useTokenAuth = True
 
         # setup the requests session
-        self._server_url_rest_base = get_server_url_base(protocol, hostname, port, instance_name) + "/rest/services"
-        self._server_url_base = get_server_url_base(protocol, hostname, port, instance_name) + "/admin"
+        serverBaseUrl = get_server_url_base(protocol, hostname, port, instance_name)
+        self._server_url_rest_base = serverBaseUrl + "/rest/services"
+        self._server_url_base = serverBaseUrl + "/admin"
         self._requests_session = requests.Session()
         self._requests_session.proxies = self._proxies
         self._requests_session.params = {"f": "json"}
@@ -136,10 +137,11 @@ class RestAdmin(object):
                 password,
                 generateTokenUrl,
                 utc_delta=utc_delta,
-                get_public_key_url=self._server_url_base + "/publicKey" if (use_ssl == False) or (use_ssl == False and encrypt == False) else None, 
-                proxies=proxies, 
+                get_public_key_url=self._server_url_base +
+                "/publicKey" if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
+                proxies=proxies,
                 client="referer" if "/sharing" in generateTokenUrl else "requestip",
-                referer=self._server_url_base if "/sharing" in generateTokenUrl else None
+                referer=serverBaseUrl if "/sharing" in generateTokenUrl else None
             )
 
         # setup sub-modules/classes
@@ -150,13 +152,15 @@ class RestAdmin(object):
 
     # Fetch the AGS rest info
     def _getRestInfo(self, protocol, hostname, port, instance_name):
+        url = get_server_info_url(protocol, hostname, port, instance_name)
         r = requests.request(
             "GET",
-            get_server_info_url(protocol, hostname, port, instance_name),
+            url,
             params={"f": "json"},
             proxies=self._proxies)
 
         if (not r.status_code == 200):
-            raise Exception("Failed to get /rest/info")
+            print(r)
+            raise Exception("Failed to get %s" % url)
 
         return r.json()
