@@ -1,4 +1,5 @@
-from __future__ import (absolute_import, division, print_function, unicode_literals)
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
@@ -8,15 +9,17 @@ from . import services
 from .machines import Machines
 from ._auth import _RestAdminAuth
 from .exceptions import InvalidServiceTypeError, UnknownServiceError, CommunicationError
-from ._utils import get_server_url_base, send_session_request
+from ._utils import get_server_url_base, send_session_request, get_server_info_url
 from .system import System
 from .services import Services
 from .uploads import Uploads
 
 import requests
+import os
 
 from datetime import datetime
 from dateutil import tz
+
 
 class RestAdmin(object):
     """
@@ -24,11 +27,17 @@ class RestAdmin(object):
     """
 
     _server_url_base = None
+    _server_url_rest_base = None
     _requests_session = None
+    _proxies = None
 
     @property
     def url(self):
         return self._server_url_base
+
+    @property
+    def rest_url(self):
+        return self._server_url_rest_base
 
     @property
     def system(self):
@@ -46,8 +55,15 @@ class RestAdmin(object):
     def uploads(self):
         return self._uploads
 
-    def __init__(self, hostname, username, password, instance_name = "arcgis", port = 6080, use_ssl = False,
-                 utc_delta = tz.tzlocal().utcoffset(datetime.now()), proxies = None, encrypt = True):
+    def __init__(self,
+                 hostname,
+                 username,
+                 password,
+                 instance_name="arcgis",
+                 port=6080,
+                 use_ssl=False, utc_delta=tz.tzlocal().utcoffset(datetime.now()),
+                 proxies=None,
+                 encrypt=True):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
@@ -87,24 +103,64 @@ class RestAdmin(object):
         :type encrypt: bool
         """
 
-        # setup the requests session
-        self._server_url_base = get_server_url_base("https" if use_ssl else "http", hostname, port, instance_name)
-        self._requests_session = requests.Session()
-        self._requests_session.params = {"f": "json"}
-        self._requests_session.auth = _RestAdminAuth(
-            username,
-            password,
-            self._server_url_base + "/generateToken",
-            utc_delta = utc_delta,
-            get_public_key_url = self._server_url_base + "/publicKey" \
-                if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
-            proxies = proxies)
+        protocol = "https" if use_ssl else "http"
 
-        if not proxies == None:
-            self._requests_session.proxies = proxies
+        # Resolve proxy from env vars
+        if proxies is None and ((os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY'))):
+            self._proxies = {
+                'http': os.environ.get('HTTP_PROXY'),
+                'https': os.environ.get('HTTPS_PROXY'),
+            }
+            print("Proxy enabled:", self._proxies)
+
+        # Resolve the generate token endpoint from /arcgis/rest/info
+        useTokenAuth = False
+        generateTokenUrl = None
+        agsInfo = self._getRestInfo(protocol, hostname, port, instance_name)
+
+        if "authInfo" in agsInfo and "isTokenBasedSecurity" in agsInfo["authInfo"]:
+            generateTokenUrl = agsInfo["authInfo"]["tokenServicesUrl"]
+            useTokenAuth = True
+
+        # setup the requests session
+        serverBaseUrl = get_server_url_base(protocol, hostname, port, instance_name)
+        self._server_url_rest_base = serverBaseUrl + "/rest/services"
+        self._server_url_base = serverBaseUrl + "/admin"
+        self._requests_session = requests.Session()
+        self._requests_session.proxies = self._proxies
+        self._requests_session.params = {"f": "json"}
+
+        # setup token auth (if required)
+        if useTokenAuth:
+            self._requests_session.auth = _RestAdminAuth(
+                username,
+                password,
+                generateTokenUrl,
+                utc_delta=utc_delta,
+                get_public_key_url=self._server_url_base +
+                "/publicKey" if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
+                proxies=proxies,
+                client="referer" if "/sharing" in generateTokenUrl else "requestip",
+                referer=serverBaseUrl if "/sharing" in generateTokenUrl else None
+            )
 
         # setup sub-modules/classes
         self._system = System(self._requests_session, self._server_url_base)
         self._machines = Machines(self._requests_session, self._server_url_base)
         self._services = Services(self._requests_session, self._server_url_base)
         self._uploads = Uploads(self._requests_session, self._server_url_base)
+
+    # Fetch the AGS rest info
+    def _getRestInfo(self, protocol, hostname, port, instance_name):
+        url = get_server_info_url(protocol, hostname, port, instance_name)
+        r = requests.request(
+            "GET",
+            url,
+            params={"f": "json"},
+            proxies=self._proxies)
+
+        if (not r.status_code == 200):
+            print(r)
+            raise Exception("Failed to get %s" % url)
+
+        return r.json()

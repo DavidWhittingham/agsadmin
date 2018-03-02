@@ -3,10 +3,12 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 import requests
+import os
 
 from rsa import PublicKey, encrypt
 
 JSON_DECODE_ERROR = "Unknown server response, error parsing server response as JSON."
+
 
 def get_public_key(public_key_url):
     """
@@ -19,10 +21,11 @@ def get_public_key(public_key_url):
     :rtype: Dict
     """
 
-    r = requests.get(public_key_url, params = {"f": "json"}).json()
+    r = requests.get(public_key_url, params={"f": "json"}).json()
     r["publicKey"] = long(r["publicKey"], 16)
     r["modulus"] = long(r["modulus"], 16)
     return r
+
 
 def encrypt_request_data(data_dict, key, modulus):
     """
@@ -49,7 +52,8 @@ def encrypt_request_data(data_dict, key, modulus):
     rpk = PublicKey(modulus, key)
     return {key: encrypt(bytes(value, "utf-8"), rpk).encode('hex') for key, value in data_dict.iteritems()}
 
-def send_session_request(session, request, ags_operation = True):
+
+def send_session_request(session, request, ags_operation=True):
     """
     For whatever reason, the requests library doesn't use pre-configured authentication or paramater information on a
     session object when you use session.send(), so this function takes a session and request object, and uses
@@ -66,10 +70,12 @@ def send_session_request(session, request, ags_operation = True):
             request.hooks["response"] = [decode_ags_operation]
 
     prepped = session.prepare_request(request)
+
     r = session.send(prepped)
 
     r.raise_for_status()
     return r
+
 
 def decode_ags_operation(response, **kwargs):
     """
@@ -93,5 +99,18 @@ def decode_ags_operation(response, **kwargs):
 
     return response
 
+
+def get_server_info_url(protocol, hostname, port, instance):
+    return "{0}://{1}{2}/{3}/rest/info".format(
+        protocol,
+        hostname,
+        "" if port == 80 else ":%s" % port,
+        instance)
+
+
 def get_server_url_base(protocol, hostname, port, instance):
-    return "{0}://{1}:{2}/{3}/admin".format(protocol, hostname, port, instance)
+    return "{0}://{1}{2}/{3}".format(
+        protocol,
+        hostname,
+        "" if port == 80 else ":%s" % port,
+        instance)
