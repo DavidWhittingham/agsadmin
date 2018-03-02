@@ -141,7 +141,7 @@ class RestAdmin(object):
                 "/publicKey" if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
                 proxies=proxies,
                 client="referer" if "/sharing" in generateTokenUrl else "requestip",
-                referer=serverBaseUrl if "/sharing" in generateTokenUrl else None
+                referer=self._server_url_base if "/sharing" in generateTokenUrl else None
             )
 
         # setup sub-modules/classes
