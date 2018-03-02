@@ -28,6 +28,12 @@ Features
     - unregister directories
     - clean directories
 
+- Uploads
+
+  - list uploads
+  - get a specific upload item
+  - upload a file
+
 These functions can be used to automate management of ArcGIS Services (e.g. start/stop services on a schedule, 
 start/stop services to perform maintenance on associated datasets, etc.)
 
