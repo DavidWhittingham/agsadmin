@@ -20,7 +20,6 @@ import os
 from datetime import datetime
 from dateutil import tz
 
-
 class RestAdmin(object):
     """
     Provides a proxy object for an ArcGIS Server instance, communicating with the REST Admin API.
@@ -61,7 +60,8 @@ class RestAdmin(object):
                  password,
                  instance_name="arcgis",
                  port=6080,
-                 use_ssl=False, utc_delta=tz.tzlocal().utcoffset(datetime.now()),
+                 use_ssl=False,
+                 utc_delta=tz.tzlocal().utcoffset(datetime.now()),
                  proxies=None,
                  encrypt=True):
         """
@@ -114,13 +114,13 @@ class RestAdmin(object):
             print("Proxy enabled:", self._proxies)
 
         # Resolve the generate token endpoint from /arcgis/rest/info
-        useTokenAuth = False
-        generateTokenUrl = None
-        agsInfo = self._getRestInfo(protocol, hostname, port, instance_name)
+        use_token_auth = False
+        generate_token_url = None
+        ags_info = self._get_rest_info(protocol, hostname, port, instance_name)
 
-        if "authInfo" in agsInfo and "isTokenBasedSecurity" in agsInfo["authInfo"]:
-            generateTokenUrl = agsInfo["authInfo"]["tokenServicesUrl"]
-            useTokenAuth = True
+        if "authInfo" in ags_info and "isTokenBasedSecurity" in ags_info["authInfo"]:
+            generate_token_url = ags_info["authInfo"]["tokenServicesUrl"]
+            use_token_auth = True
 
         # setup the requests session
         serverBaseUrl = get_server_url_base(protocol, hostname, port, instance_name)
@@ -131,17 +131,17 @@ class RestAdmin(object):
         self._requests_session.params = {"f": "json"}
 
         # setup token auth (if required)
-        if useTokenAuth:
+        if use_token_auth:
             self._requests_session.auth = _RestAdminAuth(
                 username,
                 password,
-                generateTokenUrl,
+                generate_token_url,
                 utc_delta=utc_delta,
                 get_public_key_url=self._server_url_base +
                 "/publicKey" if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
                 proxies=proxies,
-                client="referer" if "/sharing" in generateTokenUrl else "requestip",
-                referer=self._server_url_base if "/sharing" in generateTokenUrl else None
+                client="referer" if "/sharing" in generate_token_url else "requestip",
+                referer=self._server_url_base if "/sharing" in generate_token_url else None
             )
 
         # setup sub-modules/classes
@@ -151,7 +151,7 @@ class RestAdmin(object):
         self._uploads = Uploads(self._requests_session, self._server_url_base)
 
     # Fetch the AGS rest info
-    def _getRestInfo(self, protocol, hostname, port, instance_name):
+    def _get_rest_info(self, protocol, hostname, port, instance_name):
         url = get_server_info_url(protocol, hostname, port, instance_name)
         r = requests.request(
             "GET",
