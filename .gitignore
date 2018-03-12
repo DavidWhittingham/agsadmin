@@ -41,4 +41,7 @@ nosetests.xml
 # Esri Products
 *.lock
 /.cache
+
+# Repo Specific
 /.vscode
+/venvs
