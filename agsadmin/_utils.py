@@ -94,12 +94,17 @@ def decode_ags_operation(response, **kwargs):
 
     return response
 
-def get_server_info_url(protocol, hostname, port, instance):
-    return "{0}://{1}{2}/{3}/rest/info".format(
-        protocol,
-        hostname,
-        "" if port == 80 else ":%s" % port,
-        instance)
+def get_rest_info(server_url_base, session):
+    print("{0}/rest/info".format(server_url_base))
+    return send_session_request(
+            session,
+            requests.Request(
+                "GET",
+                "{0}/rest/info".format(server_url_base)
+            ),
+            True
+        ).json()
+    
 
 def get_server_url_base(protocol, hostname, port, instance):
     return "{0}://{1}{2}/{3}".format(

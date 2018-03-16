@@ -9,7 +9,7 @@ from . import services
 from .machines import Machines
 from ._auth import _RestAdminAuth
 from .exceptions import InvalidServiceTypeError, UnknownServiceError, CommunicationError
-from ._utils import get_server_url_base, send_session_request, get_server_info_url
+from ._utils import get_server_url_base, send_session_request, get_rest_info
 from .system import System
 from .services import Services
 from .uploads import Uploads
@@ -26,12 +26,17 @@ class RestAdmin(object):
     """
 
     _server_url_base = None
+    _server_admin_url_base = None
     _server_url_rest_base = None
     _requests_session = None
     _proxies = None
 
     @property
     def url(self):
+        return self._server_admin_url_base
+
+    @property
+    def instance_url(self):
         return self._server_url_base
 
     @property
@@ -113,22 +118,26 @@ class RestAdmin(object):
             }
             print("Proxy enabled:", self._proxies)
 
+        # setup the requests session
+        self._requests_session = requests.Session()
+        self._requests_session.proxies = self._proxies
+        self._requests_session.params = {"f": "json"}
+
+        # setup base URL
+        self._server_url_base = get_server_url_base(protocol, hostname, port, instance_name)
+
         # Resolve the generate token endpoint from /arcgis/rest/info
         use_token_auth = False
         generate_token_url = None
-        ags_info = self._get_rest_info(protocol, hostname, port, instance_name)
+        ags_info = get_rest_info(self._server_url_base, self._requests_session)
 
         if "authInfo" in ags_info and "isTokenBasedSecurity" in ags_info["authInfo"]:
             generate_token_url = ags_info["authInfo"]["tokenServicesUrl"]
             use_token_auth = True
 
-        # setup the requests session
-        serverBaseUrl = get_server_url_base(protocol, hostname, port, instance_name)
-        self._server_url_rest_base = serverBaseUrl + "/rest/services"
-        self._server_url_base = serverBaseUrl + "/admin"
-        self._requests_session = requests.Session()
-        self._requests_session.proxies = self._proxies
-        self._requests_session.params = {"f": "json"}
+        # generate additional URLs
+        self._server_url_rest_base = self._server_url_base + "/rest/services"
+        self._server_admin_url_base = self._server_url_base + "/admin"
 
         # setup token auth (if required)
         if use_token_auth:
@@ -137,30 +146,14 @@ class RestAdmin(object):
                 password,
                 generate_token_url,
                 utc_delta=utc_delta,
-                get_public_key_url=self._server_url_base +
-                "/publicKey" if (use_ssl == False) or (use_ssl == False and encrypt == False) else None,
+                get_public_key_url=None if encrypt == False or use_ssl == True else self._server_admin_url_base + "/publicKey"
                 proxies=proxies,
                 client="referer" if "/sharing" in generate_token_url else "requestip",
-                referer=self._server_url_base if "/sharing" in generate_token_url else None
+                referer=self._server_admin_url_base if "/sharing" in generate_token_url else None
             )
 
         # setup sub-modules/classes
-        self._system = System(self._requests_session, self._server_url_base)
-        self._machines = Machines(self._requests_session, self._server_url_base)
-        self._services = Services(self._requests_session, self._server_url_base)
-        self._uploads = Uploads(self._requests_session, self._server_url_base)
-
-    # Fetch the AGS rest info
-    def _get_rest_info(self, protocol, hostname, port, instance_name):
-        url = get_server_info_url(protocol, hostname, port, instance_name)
-        r = requests.request(
-            "GET",
-            url,
-            params={"f": "json"},
-            proxies=self._proxies)
-
-        if (not r.status_code == 200):
-            print(r)
-            raise Exception("Failed to get %s" % url)
-
-        return r.json()
+        self._system = System(self._requests_session, self._server_admin_url_base)
+        self._machines = Machines(self._requests_session, self._server_admin_url_base)
+        self._services = Services(self._requests_session, self._server_admin_url_base)
+        self._uploads = Uploads(self._requests_session, self._server_admin_url_base)
