@@ -2,10 +2,10 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-from .._endpoint_base import _EndpointBase
+from .._endpoint_base import EndpointBase
 from .Directories import Directories
 
-class System(_EndpointBase):
+class System(EndpointBase):
     
     def __init__(self, requests_session, server_url):
         super().__init__(requests_session, server_url)

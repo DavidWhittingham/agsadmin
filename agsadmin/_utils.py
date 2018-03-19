@@ -106,7 +106,7 @@ def get_rest_info(server_url_base, session):
         ).json()
     
 
-def get_server_url_base(protocol, hostname, port, instance):
+def get_instance_url_base(protocol, hostname, port, instance):
     return "{0}://{1}{2}/{3}".format(
         protocol,
         hostname,

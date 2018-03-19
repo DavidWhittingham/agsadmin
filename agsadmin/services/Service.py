@@ -6,12 +6,12 @@ import abc
 from json import dumps
 
 from .._utils import send_session_request
-from .._endpoint_base import _EndpointBase
+from .._endpoint_base import EndpointBase
 from ._permissions_mixin import _PermissionsMixin
 from .ServiceType import ServiceType
 from .Folder import Folder
 
-class Service(_PermissionsMixin, _EndpointBase):
+class Service(_PermissionsMixin, EndpointBase):
     """
     Base class for all types of ArcGIS Server services. Implements the core operations supported by all services,
     and decribes abstract properties that need to be supported by all implementors.

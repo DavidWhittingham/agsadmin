@@ -1,7 +1,7 @@
-from agsadmin._endpoint_base import _EndpointBase
+from agsadmin._endpoint_base import EndpointBase
 from agsadmin._utils import send_session_request
 
-class _PermissionsMixin(_EndpointBase):
+class _PermissionsMixin(EndpointBase):
 
     ####################
     ## PUBLIC METHODS ##

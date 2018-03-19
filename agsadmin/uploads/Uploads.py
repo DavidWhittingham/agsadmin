@@ -4,11 +4,11 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from os import path
 
-from .._endpoint_base import _EndpointBase
+from .._endpoint_base import EndpointBase
 from .._utils import send_session_request
 from .UploadedItem import UploadedItem
 
-class Uploads(_EndpointBase):
+class Uploads(EndpointBase):
 
     def __init__(self, requests_session, server_url):
         super().__init__(requests_session, server_url)
@@ -29,7 +29,7 @@ class Uploads(_EndpointBase):
 
         return items
 
-    def upload(self, file_to_upload, description = None):
+    def upload(self, path_to_file, description = None):
         """
         Uploads the specified file to ArcGIS Server
         """
@@ -41,7 +41,7 @@ class Uploads(_EndpointBase):
                 operation = "upload",
                 method = "POST",
                 data = { "description": description } if description != None else None,
-                files = { "itemFile": (path.basename(file_to_upload.name), file_to_upload) }
+                files = { "itemFile": (path.basename(path_to_file), open(path_to_file, 'rb'), 'application/octet-stream', {'Expires': '0'}) }
             )
         ).json()
 

@@ -8,7 +8,7 @@ from requests import Request
 
 from ._utils import send_session_request
 
-class _EndpointBase(object):
+class EndpointBase(object):
     """
     Base class for all ArcGIS Server interactive endpoints.  Contains abstract items for dealing with service
     communication.
@@ -66,7 +66,7 @@ class _EndpointBase(object):
         return Request(
             method,
             "{endpoint}/{operation}".format(
-                endpoint = endpoint._url_full if isinstance(endpoint, _EndpointBase) else endpoint,
+                endpoint = endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
                 operation = operation if operation else ""
             ),
             data = data,

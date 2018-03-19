@@ -5,10 +5,10 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from datetime import (datetime, timedelta)
 from dateutil import tz
 
-from .._endpoint_base import _EndpointBase
+from .._endpoint_base import EndpointBase
 from .._utils import send_session_request
 
-class UploadedItem(_EndpointBase):
+class UploadedItem(EndpointBase):
 
     # replaces tzinfo with UTC, as bizarely utcfromtimestamp comes with no timezone info (despit UTC being in the name)
     _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=tz.tzutc())
