@@ -146,7 +146,7 @@ class RestAdmin(object):
                 password,
                 generate_token_url,
                 utc_delta=utc_delta,
-                get_public_key_url=None if encrypt == False or use_ssl == True else self._server_admin_url_base + "/publicKey"
+                get_public_key_url=None if encrypt == False or use_ssl == True else self._server_admin_url_base + "/publicKey",
                 proxies=proxies,
                 client="referer" if "/sharing" in generate_token_url else "requestip",
                 referer=self._server_admin_url_base if "/sharing" in generate_token_url else None
