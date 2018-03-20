@@ -95,7 +95,6 @@ def decode_ags_operation(response, **kwargs):
     return response
 
 def get_rest_info(server_url_base, session):
-    print("{0}/rest/info".format(server_url_base))
     return send_session_request(
             session,
             requests.Request(
