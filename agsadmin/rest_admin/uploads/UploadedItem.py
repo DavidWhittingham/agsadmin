@@ -5,8 +5,8 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from datetime import (datetime, timedelta)
 from dateutil import tz
 
-from .._endpoint_base import EndpointBase
-from .._utils import send_session_request
+from ..._endpoint_base import EndpointBase
+from ..._utils import send_session_request
 
 class UploadedItem(EndpointBase):
 

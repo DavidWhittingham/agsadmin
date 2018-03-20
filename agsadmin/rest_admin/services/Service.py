@@ -5,8 +5,8 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 import abc
 from json import dumps
 
-from .._utils import send_session_request
-from .._endpoint_base import EndpointBase
+from ..._endpoint_base import EndpointBase
+from ..._utils import send_session_request
 from ._permissions_mixin import _PermissionsMixin
 from .ServiceType import ServiceType
 from .Folder import Folder

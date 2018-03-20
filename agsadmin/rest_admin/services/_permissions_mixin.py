@@ -1,5 +1,9 @@
-from agsadmin._endpoint_base import EndpointBase
-from agsadmin._utils import send_session_request
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
+                      super, zip)
+
+from ..._endpoint_base import EndpointBase
+from ..._utils import send_session_request
 
 class _PermissionsMixin(EndpointBase):
 

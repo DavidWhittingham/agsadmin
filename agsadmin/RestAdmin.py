@@ -5,20 +5,16 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from datetime import datetime
 from dateutil import tz
 
-from .machines import Machines
-from .system import System
-from .services import Services
-from .uploads import Uploads
+from .rest_admin.machines import Machines
+from .rest_admin.system import System
+from .rest_admin.services import Services
+from .rest_admin.uploads import Uploads
 from ._admin_base import AdminBase
 
 class RestAdmin(AdminBase):
     """
     Provides a proxy object for an ArcGIS Server instance, communicating with the REST Admin API.
     """
-
-    @property
-    def rest_url(self):
-        return self.instance_url + "/rest/services"
 
     @property
     def system(self):

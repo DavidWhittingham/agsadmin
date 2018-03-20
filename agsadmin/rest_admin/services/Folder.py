@@ -2,11 +2,10 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-from .._endpoint_base import EndpointBase
-from .._utils import send_session_request
+from ..._endpoint_base import EndpointBase
+from ..._utils import send_session_request
 from ._permissions_mixin import _PermissionsMixin
 from .ServiceType import ServiceType
-#from ._utils import _get_service_class
 
 class Folder(_PermissionsMixin, EndpointBase):
 
