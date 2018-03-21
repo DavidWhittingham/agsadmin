@@ -5,3 +5,4 @@ Python Library used to provide conveniant access to administrative functions of 
 
 from ._version import *
 from .RestAdmin import RestAdmin
+from .SharingAdmin import SharingAdmin
