@@ -110,7 +110,7 @@ class Service(_PermissionsMixin, EndpointBase):
         Sets the item info (description, summary, tags, etc.) for the service.  Note that this will completely
         overwrite the existing item info, so make sure all attributes are included.
         """
-        r = self._create_operation_request(self._url_full,  "iteminfo/edit")
+        r = self._create_operation_request(self._url_full, "iteminfo/edit")
         r.data = {"serviceItemInfo": dumps(new_info)}
         return send_session_request(self._session, r).json()
 
