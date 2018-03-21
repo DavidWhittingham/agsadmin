@@ -6,11 +6,11 @@ import abc
 
 from os import environ
 
-from requests import Session
+from requests import Request, Session
 
 from ._auth import _RestAdminAuth
 from ._endpoint_base import EndpointBase
-from ._utils import get_instance_url_base, get_rest_info
+from ._utils import get_instance_url_base, send_session_request
 
 class AdminBase(EndpointBase):
     """
@@ -95,7 +95,7 @@ class AdminBase(EndpointBase):
 
         # Resolve the generate token endpoint from /arcgis/rest/info
         generate_token_url = None
-        ags_info = get_rest_info(self._url_base, self._session)
+        ags_info = self.get_server_info()
 
         if "authInfo" in ags_info and "isTokenBasedSecurity" in ags_info["authInfo"]:
             # token auth in use, setup auto-auth on requests on the session
@@ -111,3 +111,13 @@ class AdminBase(EndpointBase):
                 client="referer" if "/sharing" in generate_token_url else "requestip",
                 referer=self._url_full if "/sharing" in generate_token_url else None
             )
+    
+    def get_server_info(self):
+        return send_session_request(
+            self._session,
+            Request(
+                "GET",
+                "{0}/rest/info".format(self._url_base)
+            ),
+            True
+        ).json()

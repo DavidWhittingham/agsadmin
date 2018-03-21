@@ -94,17 +94,6 @@ def decode_ags_operation(response, **kwargs):
 
     return response
 
-def get_rest_info(server_url_base, session):
-    return send_session_request(
-            session,
-            requests.Request(
-                "GET",
-                "{0}/rest/info".format(server_url_base)
-            ),
-            True
-        ).json()
-    
-
 def get_instance_url_base(protocol, hostname, port, instance):
     return "{0}://{1}{2}/{3}".format(
         protocol,
