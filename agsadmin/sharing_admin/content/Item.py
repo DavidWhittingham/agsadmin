@@ -22,7 +22,7 @@ class Item(EndpointBase):
             "id": item_id
         }
 
-    def share_item(self, everyone, org, groups, confirm_item_control):
+    def share(self, everyone, org, groups, confirm_item_control):
         r = self._create_operation_request(self._url_full, "share")
         
         r.data = {
