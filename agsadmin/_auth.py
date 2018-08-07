@@ -1,11 +1,12 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
+from future.standard_library import install_aliases
+install_aliases()
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
 import requests
 from datetime import datetime, timedelta
-from urlparse import urlparse, urlunparse, parse_qs
-from urllib import urlencode
+from future.moves.urllib.parse import urlparse, urlencode, urlunparse, parse_qs
 from ._utils import get_public_key, encrypt_request_data
 
 
