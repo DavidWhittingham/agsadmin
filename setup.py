@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
-with open('agsadmin/_version.py') as fin: exec(fin)
-with open('requirements.txt') as fin: requirements = [s.strip() for s in fin.readlines()]
-with open('README.rst') as fin: long_description = fin.read()
+with open("agsadmin/_version.py") as fin: exec(fin.read(), globals())
+with open("requirements.txt") as fin: requirements = [s.strip() for s in fin.readlines()]
+with open("README.rst") as fin: long_description = fin.read()
 
 packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 	
@@ -31,7 +31,7 @@ setup(
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 2.7"
+        "Programming Language :: Python"
     ),
     
     zip_safe = False
