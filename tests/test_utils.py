@@ -9,13 +9,19 @@ import pytest
 
 from json import loads
 
+from future.utils import iteritems
+
 @pytest.mark.parametrize(("data", "rsa_key", "modulus"), [
-    ({"key1": "value1", "key2": "value2", "key3": "value3"}, 
-     long("06DE8", 16),
-     long("AD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A", 16)),
-    ({"key1": "value1", "key2": "value2", "key3": "value3"}, 
-     long("06DE8", 16),
-     long("AD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A", 16))
+    (
+        {"key1": "value1", "key2": "value2", "key3": "value3"},
+        0x06DE8,
+        0xAD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A
+    ),
+    (
+        {"key1": "value1", "key2": "value2", "key3": "value3"}, 
+        0x06DE8,
+        0xAD24236B572696888F2BF0D4C0FA64574104F5D3AF20A7A422D02551699734B6FC79ABD9E8C319AA7915752AB48313B021DDB3A0CDB5974C8549885F971A9F09A
+    )
 ])
 def test_encrypt_request_data_rsa(data, rsa_key, modulus):
     """
@@ -27,7 +33,7 @@ def test_encrypt_request_data_rsa(data, rsa_key, modulus):
 
     assert len(set(data.keys()) - set(encrypted_data.keys())) == 0
 
-    for key, value in data.iteritems():
+    for key, value in iteritems(data):
         assert value != encrypted_data[key]
 
 def test_decode_ags_operation():

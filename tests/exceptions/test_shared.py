@@ -10,4 +10,4 @@ import agsadmin.exceptions
 ])
 def test_exception_message(ex, expected_output, construction_message):
     instantiated_exception = ex() if construction_message == None else ex(construction_message)
-    assert instantiated_exception.message == expected_output
+    assert str(instantiated_exception) == expected_output
