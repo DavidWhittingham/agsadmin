@@ -4,6 +4,9 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 import requests
 
+from binascii import b2a_hex
+
+from future.utils import iteritems
 from rsa import PublicKey, encrypt
 
 JSON_DECODE_ERROR = "Unknown server response, error parsing server response as JSON."
@@ -20,8 +23,8 @@ def get_public_key(public_key_url):
     """
 
     r = requests.get(public_key_url, params={"f": "json"}).json()
-    r["publicKey"] = long(r["publicKey"], 16)
-    r["modulus"] = long(r["modulus"], 16)
+    r["publicKey"] = int(r["publicKey"], 16)
+    r["modulus"] = int(r["modulus"], 16)
     return r
 
 def encrypt_request_data(data_dict, key, modulus):
@@ -36,10 +39,10 @@ def encrypt_request_data(data_dict, key, modulus):
     :type data_dict: Dict
 
     :param key: The ArcGIS Server REST Admin API RSA public key
-    :type key: int
+    :type key: Integer
 
     :param modulus: The ArcGIS Server REST Admin API RSA modulus
-    :type modulus: long
+    :type modulus: Integer
 
     :returns: A new copy of the dictionary with all values encrypted using the public key and the RSA PKCS v1.5
         algorithm.
@@ -47,7 +50,7 @@ def encrypt_request_data(data_dict, key, modulus):
     """
 
     rpk = PublicKey(modulus, key)
-    return {key: encrypt(bytes(value, "utf-8"), rpk).encode('hex') for key, value in data_dict.iteritems()}
+    return {key: b2a_hex(encrypt(bytes(value, "utf-8"), rpk)) for key, value in iteritems(data_dict)}
 
 def send_session_request(session, request, ags_operation=True):
     """
