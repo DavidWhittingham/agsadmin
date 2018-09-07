@@ -4,12 +4,13 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ..._endpoint_base import EndpointBase
 from ..._utils import send_session_request
+from ._folder_mixin import _FolderMixin
 from .Folder import Folder
 from .Service import Service
 from .ServiceType import ServiceType
 from .types import Types
 
-class Services(EndpointBase):
+class Services(_FolderMixin, EndpointBase):
 
     def __init__(self, requests_session, server_url):
         super().__init__(requests_session, server_url)

@@ -8,7 +8,6 @@ from json import dumps
 from ..._endpoint_base import EndpointBase
 from ..._utils import send_session_request
 from ._permissions_mixin import _PermissionsMixin
-from .ServiceType import ServiceType
 from .Folder import Folder
 
 class Service(_PermissionsMixin, EndpointBase):
@@ -61,6 +60,10 @@ class Service(_PermissionsMixin, EndpointBase):
         # Use Service rather than self because method is possibly overridden
         return Service._get_service_url(self._url_base, self.name, self._type, self.folder)
 
+    @property
+    def _url_parent(self):
+        return Service._get_service_root_url(self._url_base, self.folder)
+
     ####################
     ## PUBLIC METHODS ##
     ####################
@@ -90,6 +93,27 @@ class Service(_PermissionsMixin, EndpointBase):
         Gets the current status of the ArcGIS Service.
         """
         return send_session_request(self._session, self._create_operation_request(self._url_full, "status")).json()
+
+    def rename(self, new_service_name):
+        """
+        Renames the service.
+        """
+        result = send_session_request(
+            self._session,
+            self._create_operation_request(
+                self._url_parent,
+                "renameService",
+                data = {
+                    "serviceName": self.name,
+                    "serviceType": self._type,
+                    "serviceNewName": new_service_name
+                }
+            )
+        ).json()
+
+        self._name = new_service_name
+
+        return result
 
     def stop_service(self):
         """
@@ -146,12 +170,17 @@ class Service(_PermissionsMixin, EndpointBase):
             )
 
     @staticmethod
-    def _create_from_json(service_json, session, url_base, folder_name):
-        service_enum = ServiceType(service_json["type"])
-        service_name = service_json["serviceName"]
+    def _get_service_root_url(base_url, folder = None):
+        """
+        Constructs the full root URL for a service endpoint (i.e. it's parent folder, or the top level services folder).
 
-        return ServiceType._get_proxy(service_enum)(
-                        session,
-                        url_base,
-                        service_name,
-                        folder_name)
+        :param base_url: The base URL of the ArcGIS Server Admin API (usually 'http://serverName:port/instance_name/admin')
+        :type base_url: str
+
+        :param folder_name: If the service is not at the root level, specify the folder it resides in.
+        :type folder_name: str
+        """
+        return ("{base}/services/{folder}" if folder else "{base}/services").format(
+                base = base_url,
+                folder = folder
+            )
