@@ -5,6 +5,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from ..._endpoint_base import EndpointBase
 from ..._utils import send_session_request
 from ._folder_mixin import _FolderMixin
+from ._service_factory import _create_service_from_json
 from .Folder import Folder
 from .Service import Service
 from .ServiceType import ServiceType
@@ -45,7 +46,7 @@ class Services(_FolderMixin, EndpointBase):
 
         services = []
         for s in response["services"]:
-            services.append(Service._create_from_json(s, self._session, self._url_base, s["folderName"]))
+            services.append(_create_service_from_json(s, self._session, self._url_base, s["folderName"]))
 
         return services
 
@@ -74,4 +75,4 @@ class Services(_FolderMixin, EndpointBase):
             self._session,
             self._create_operation_request(url, method = "GET")).json()
 
-        return Service._create_from_json(service_response, self._session, self._url_base, folder_name)
+        return _create_service_from_json(service_response, self._session, self._url_base, folder_name)
