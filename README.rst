@@ -7,13 +7,17 @@ agsadmin provides a convenient Python front-end to several REST calls on the Arc
 Features
 ========
 
-- Map/Geoprocessing Services
+ArcGIS Server (RestAdmin)
+*************************
+
+- Services (Map/Image/Geoprocessing/Geometry/Geocode/GeoData/Globe/Search)
 
   - start and stop
   - get statistics
   - get status
   - get or set the item info (description, summary, tags, etc.)
   - set service properties
+  - rename services
   
 - Machines
 
@@ -36,6 +40,14 @@ Features
 
 These functions can be used to automate management of ArcGIS Services (e.g. start/stop services on a schedule, 
 start/stop services to perform maintenance on associated datasets, etc.)
+
+ArcGIS Portal (SharingAdmin)
+****************************
+
+- Content
+
+  - get item
+  - get user item
 
 Example
 =======
