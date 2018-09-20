@@ -28,6 +28,10 @@ class AdminBase(EndpointBase):
     def instance_url(self):
         return self._url_base
 
+    @property
+    def username(self):
+        return self._pdata["username"]
+
     def __init__(self,
                  hostname,
                  username,
@@ -73,7 +77,9 @@ class AdminBase(EndpointBase):
         :type encrypt: bool
         """
 
-        self._admin_base_data = {}
+        self._pdata = {
+            "username": username
+        }
 
         protocol = "https" if use_ssl else "http"
 
@@ -100,7 +106,7 @@ class AdminBase(EndpointBase):
         if "authInfo" in ags_info and "isTokenBasedSecurity" in ags_info["authInfo"]:
             # token auth in use, setup auto-auth on requests on the session
             generate_token_url = ags_info["authInfo"]["tokenServicesUrl"]
-            
+
             self._session.auth = _RestAdminAuth(
                 username,
                 password,
@@ -111,7 +117,7 @@ class AdminBase(EndpointBase):
                 client="referer" if "/sharing" in generate_token_url else "requestip",
                 referer=self._url_full if "/sharing" in generate_token_url else None
             )
-    
+
     def get_server_info(self):
         return send_session_request(
             self._session,
