@@ -22,9 +22,15 @@ class Item(EndpointBase):
             "id": item_id
         }
 
+    def get_properties(self):
+        """
+        Gets the properties of the item.
+        """
+        return self._get()
+
     def share(self, everyone, org, groups, confirm_item_control):
         r = self._create_operation_request(self._url_full, "share", method = "POST")
-        
+
         r.data = {
             "everyone": everyone == True or False,
             "org": org == True or False
@@ -35,5 +41,5 @@ class Item(EndpointBase):
 
         if confirm_item_control != None:
             r.data["confirmItemControl"] = confirm_item_control == True or False
-        
+
         return send_session_request(self._session, r).json()
