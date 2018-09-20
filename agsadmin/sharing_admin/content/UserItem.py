@@ -20,3 +20,8 @@ class UserItem(Item):
         super().__init__(requests_session, content_url, item_id)
 
         self._pdata["username"] = username
+
+    def delete(self):
+        r = self._create_operation_request(self._url_full, "delete", method = "POST")
+
+        return send_session_request(self._session, r).json()
