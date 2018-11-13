@@ -29,7 +29,7 @@ class Item(EndpointBase):
         return self._get()
 
     def share(self, everyone, org, groups, confirm_item_control):
-        r = self._create_operation_request(self._url_full, "share", method = "POST")
+        r = self._create_operation_request(self, "share", method = "POST")
 
         r.data = {
             "everyone": everyone == True or False,

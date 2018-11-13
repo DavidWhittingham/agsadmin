@@ -3,25 +3,25 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 from ..._endpoint_base import EndpointBase
-from ..._utils import send_session_request
 from .Item import Item
-from .UserItem import UserItem
+from .users import Users
 
 class Content(EndpointBase):
-    
+
     def __init__(self, requests_session, url_base):
         super().__init__(requests_session, url_base)
+
+        self._pdata = {
+            "users": Users(self._session, self._url_full)
+        }
 
     @property
     def _url_full(self):
         return "{0}/content".format(self._url_base)
-    
-    def get_user_item(self, username, item_id):
-        """
-        Gets a link to a content item in the portal owned by a particular user.
-        """
 
-        return UserItem(self._session, self._url_full, username, item_id)
+    @property
+    def users(self):
+        return self._pdata["users"]
 
     def get_item(self, item_id):
         """
