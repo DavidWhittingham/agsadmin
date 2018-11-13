@@ -22,7 +22,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
     _expiration = None
     _client = None
     _referer = None
-    _ip = None 
+    _ip = None
 
     def __init__(self,
                  username,
@@ -34,7 +34,8 @@ class _RestAdminAuth(requests.auth.AuthBase):
                  proxies=None,
                  client=None,
                  referer=None,
-                 ip=None):
+                 ip=None,
+                 verify=True):
         """Authorization agent for attching the ArcGIS Server REST Admin API Token to each request sent to an ArcGIS
         Server instance.
 
@@ -61,6 +62,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
         self._client = client
         self._referer = referer
         self._ip = ip
+        self._verify = verify
 
     def __call__(self, r):
         # modify and return the request
@@ -108,7 +110,7 @@ class _RestAdminAuth(requests.auth.AuthBase):
                                  self._get_token_url,
                                  data=req_data,
                                  proxies=self._proxies,
-                                 verify=False)
+                                 verify=self._verify)
 
             if (not r.status_code == 200):
                 print(tk)

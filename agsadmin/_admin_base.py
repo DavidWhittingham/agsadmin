@@ -41,7 +41,8 @@ class AdminBase(EndpointBase):
                  use_ssl,
                  utc_delta,
                  proxy,
-                 encrypt):
+                 encrypt,
+                 verify=True):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
@@ -75,6 +76,11 @@ class AdminBase(EndpointBase):
         Server instance.  Setting this to False disables public key crypto.  When communicating over SSL, this
         parameter is ignored, as SSL will already encrypt the traffic.
         :type encrypt: bool
+
+        :param verify: Is set to True (default), which causes SSL certificates to be verified.  Can be set to false
+        to disable verification, or set to the path of a CA_BUNDLE file, or to a directory with certifcates of a
+        trusted certificate authority, to use for validating certificates.
+        :type encrypt: bool or str
         """
 
         self._pdata = {
@@ -93,6 +99,7 @@ class AdminBase(EndpointBase):
         # setup the requests session
         proxies = { protocol: proxy } if not proxy == None else None
         s = Session()
+        s.verify = verify
         s.params = { "f": "json" }
         s.proxies = proxies
 
@@ -115,7 +122,8 @@ class AdminBase(EndpointBase):
                 get_public_key_url=None if encrypt == False or use_ssl == True else self._url_full + "/publicKey",
                 proxies=proxies,
                 client="referer" if "/sharing" in generate_token_url else "requestip",
-                referer=self._url_full if "/sharing" in generate_token_url else None
+                referer=self._url_full if "/sharing" in generate_token_url else None,
+                verify=verify
             )
 
     def get_server_info(self):

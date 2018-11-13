@@ -5,7 +5,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from datetime import datetime
 from dateutil import tz
 
-from .sharing_admin.content import Content
+from .sharing_admin.content.Content import Content
 from .sharing_admin.community import Community
 from ._admin_base import AdminBase
 
@@ -38,7 +38,8 @@ class SharingAdmin(AdminBase):
                  use_ssl=False,
                  utc_delta=tz.tzlocal().utcoffset(datetime.now()),
                  proxy=None,
-                 encrypt=True):
+                 encrypt=True,
+                 verify=True):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
@@ -75,9 +76,14 @@ class SharingAdmin(AdminBase):
         Server instance.  Setting this to False disables public key crypto.  When communicating over SSL, this
         parameter is ignored, as SSL will already encrypt the traffic.
         :type encrypt: bool
+
+        :param verify: Is set to True (default), which causes SSL certificates to be verified.  Can be set to false
+        to disable verification, or set to the path of a CA_BUNDLE file, or to a directory with certifcates of a
+        trusted certificate authority, to use for validating certificates.
+        :type encrypt: bool or str
         """
 
-        super().__init__(hostname, username, password, instance_name, port, use_ssl, utc_delta, proxy, encrypt)
+        super().__init__(hostname, username, password, instance_name, port, use_ssl, utc_delta, proxy, encrypt, verify)
 
         # setup sub-modules/classes
         self._content = Content(self._session, self.url)
