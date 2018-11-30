@@ -6,8 +6,8 @@ from ...._endpoint_base import EndpointBase
 from ...._utils import send_session_request
 from ..Item import Item
 
-class UserItem(Item):
 
+class UserItem(Item):
     @property
     def username(self):
         return self._pdata["username"]
@@ -21,9 +21,12 @@ class UserItem(Item):
 
         self._pdata["username"] = username
 
-    def delete(self):
-        r = self._create_operation_request(self, "delete", method = "POST")
+    def move(self, folder_id):
+        r = self._create_operation_request(self, "move", method="POST", data={"folder": folder_id})
+        return send_session_request(self._session, r).json()
 
+    def delete(self):
+        r = self._create_operation_request(self, "delete", method="POST")
         return send_session_request(self._session, r).json()
 
     def get_properties(self):
@@ -39,6 +42,5 @@ class UserItem(Item):
         return self._get()["sharing"]
 
     def update(self, updated_item_info):
-        r = self._create_operation_request(self, "update", method = "POST", data = updated_item_info)
-
+        r = self._create_operation_request(self, "update", method="POST", data=updated_item_info)
         return send_session_request(self._session, r).json()
