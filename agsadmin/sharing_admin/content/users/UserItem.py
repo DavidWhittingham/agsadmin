@@ -26,6 +26,18 @@ class UserItem(Item):
 
         return send_session_request(self._session, r).json()
 
+    def get_properties(self):
+        """
+        Gets the properties of the item.
+        """
+        return self._get()["item"]
+
+    def get_sharing(self):
+        """
+        Gets the sharing details of the item.
+        """
+        return self._get()["sharing"]
+
     def update(self, updated_item_info):
         r = self._create_operation_request(self, "update", method = "POST", data = updated_item_info)
 
