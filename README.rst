@@ -47,7 +47,16 @@ ArcGIS Portal (SharingAdmin)
 - Content
 
   - get item
-  - get user item
+  - add/get/move/delete/update user item
+  - get user/folder content
+
+- Community
+
+  - get user
+  - get group
+  - create group
+  - update group
+
 
 Example
 =======
