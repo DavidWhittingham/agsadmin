@@ -23,7 +23,7 @@ class Groups(EndpointBase):
     def get(self, id):
         return Group(self._session, self._url_full, id)
 
-    def create_group(self, create_group_params):
+    def create(self, create_group_params):
 
         create_group_params = create_group_params._get_params() if isinstance(
             create_group_params, CreateUpdateGroupParams) else copy.deepcopy(create_group_params)
