@@ -46,7 +46,7 @@ class Group(EndpointBase):
             del update_group_params["thumbnail"]
             r = self._create_operation_request(
                 self,
-                "updateGroup",
+                "update",
                 method="POST",
                 data=update_group_params,
                 files={
@@ -54,6 +54,6 @@ class Group(EndpointBase):
                                   mimetypes.guess_type(thumbnail_path, False)[0])
                 })
         else:
-            r = self._create_operation_request(self, "updateGroup", method="POST", data=update_group_params)
+            r = self._create_operation_request(self, "update", method="POST", data=update_group_params)
 
         return send_session_request(self._session, r).json()
