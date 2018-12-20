@@ -5,9 +5,11 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from datetime import datetime
 from dateutil import tz
 
-from .sharing_admin.content.Content import Content
+from .sharing_admin.content import Content
 from .sharing_admin.community import Community
+from .sharing_admin.portals import Portals
 from ._admin_base import AdminBase
+
 
 class SharingAdmin(AdminBase):
     """
@@ -21,6 +23,10 @@ class SharingAdmin(AdminBase):
     @property
     def community(self):
         return self._community
+
+    @property
+    def portals(self):
+        return self._portals
 
     @property
     def _url_full(self):
@@ -88,3 +94,4 @@ class SharingAdmin(AdminBase):
         # setup sub-modules/classes
         self._content = Content(self._session, self.url)
         self._community = Community(self._session, self.url)
+        self._portals = Portals(self._session, self.url)

@@ -1,1 +1,2 @@
-from ItemType import ItemType
+from .Content import Content
+from .ItemType import ItemType
