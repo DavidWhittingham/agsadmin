@@ -2,18 +2,16 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-from ...._endpoint_base import EndpointBase
 from ...._utils import send_session_request
+from ..._PortalEndpointBase import PortalEndpointBase
 from .UserItem import UserItem
 
-class UserContentBase(EndpointBase):
 
+class UserContentBase(PortalEndpointBase):
     def __init__(self, requests_session, url_base, username):
         super().__init__(requests_session, url_base)
 
-        self._pdata = {
-            "username": username
-        }
+        self._pdata = {"username": username}
 
     @property
     def _url_full(self):
@@ -24,8 +22,7 @@ class UserContentBase(EndpointBase):
         return self._pdata["username"]
 
     def add_item(self, new_item):
-        r = self._create_operation_request(self, "addItem", method = "POST", data = new_item)
-
+        r = self._create_operation_request(self, "addItem", method="POST", data=new_item)
         return send_session_request(self._session, r).json()
 
     def list_items(self):

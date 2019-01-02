@@ -2,12 +2,12 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-from ...._endpoint_base import EndpointBase
 from ...._utils import send_session_request
+from ..._PortalEndpointBase import PortalEndpointBase
 from .User import User
 
 
-class Users(EndpointBase):
+class Users(PortalEndpointBase):
     def __init__(self, requests_session, url_base):
         super().__init__(requests_session, url_base)
 
