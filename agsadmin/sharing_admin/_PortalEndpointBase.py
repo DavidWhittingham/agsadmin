@@ -10,6 +10,7 @@ import os
 
 from future.utils import iteritems
 from requests import Request
+from requests.utils import to_key_val_list
 
 from .._endpoint_base import EndpointBase
 
@@ -23,7 +24,7 @@ class PortalEndpointBase(EndpointBase):
     __metaclass__ = abc.ABCMeta
 
     @staticmethod
-    def _create_operation_request(endpoint, operation=None, method="POST", data=None, files={}):
+    def _create_operation_request(endpoint, operation=None, method="POST", data=None, files=None):
         """
         Creates an operation request against a given ArcGIS Server endpoint.
 
@@ -37,6 +38,8 @@ class PortalEndpointBase(EndpointBase):
                        accept/require GET
         :type method: str
         """
+
+        files = to_key_val_list(files or {})
 
         # data may come in as an object containing other complex objects types (e.g. strings, lists), these should be
         # encoded to JSON strings
@@ -52,11 +55,11 @@ class PortalEndpointBase(EndpointBase):
             data = encoded_data
 
             # determine if we need to take any data paramaters and send them as files
-            if "thumbnail" in data:
+            if "thumbnail" in data and not data["thumbnail"] is None:
                 thumbnail_path = data["thumbnail"]
-                files["thumbnail"] = (os.path.basename(thumbnail_path), open(thumbnail_path, "rb"),
-                                            mimetypes.guess_type(thumbnail_path, False)[0])
-                del data["thumbnail"]    
+                files.append(("thumbnail", (os.path.basename(thumbnail_path), open(thumbnail_path, "rb"),
+                                            mimetypes.guess_type(thumbnail_path, False)[0])))
+                del data["thumbnail"]
 
         return Request(
             method,
