@@ -89,13 +89,6 @@ class AdminBase(EndpointBase):
 
         protocol = "https" if use_ssl else "http"
 
-        # Resolve proxy from env vars
-        if proxy is None:
-            if use_ssl and environ.get('HTTPS_PROXY'):
-                proxy = environ.get('HTTPS_PROXY')
-            if not use_ssl and environ.get('HTTP_PROXY'):
-                proxy = environ.get('HTTP_PROXY')
-
         # setup the requests session
         proxies = { protocol: proxy } if not proxy == None else None
         s = Session()
