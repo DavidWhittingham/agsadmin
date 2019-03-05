@@ -22,7 +22,7 @@ def test():
         cmd(r"python setup.py build")
         cmd(r"pip uninstall -y agsadmin")
         with open("agsadmin/_version.py") as fin: exec(fin.read(), globals())
-        cmd(r"pip install dist/agsadmin-{}-py2-none-any.whl".format(__version__))
+        cmd(r"pip install dist/agsadmin-{}-py2.py3-none-any.whl".format(__version__))
         cmd(r"python -m pytest -s tests")
 
 
