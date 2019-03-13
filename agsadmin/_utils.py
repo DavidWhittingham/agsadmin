@@ -70,7 +70,10 @@ def send_session_request(session, request, ags_operation=True):
 
     prepped = session.prepare_request(request)
 
-    r = session.send(prepped)
+    # merge in environment variables, to pick up proxies
+    settings = session.merge_environment_settings(request.url, session.proxies, None, session.verify, session.cert)
+
+    r = session.send(prepped, **settings)
 
     r.raise_for_status()
     return r
