@@ -90,7 +90,7 @@ class AdminBase(EndpointBase):
         protocol = "https" if use_ssl else "http"
 
         # setup the requests session
-        proxies = { protocol: proxy } if not proxy == None else None
+        proxies = { protocol: proxy } if proxy else {}
         s = Session()
         s.verify = verify
         s.params = { "f": "json" }
