@@ -43,3 +43,7 @@ class UserItem(Item):
     def update(self, updated_item_info):
         r = self._create_operation_request(self, "update", method="POST", data=updated_item_info)
         return send_session_request(self._session, r).json()
+
+    def update_thumbnail(self, updated_thumbnail_info):
+        r = self._create_operation_request(self, "updateThumbnail", method="POST", data=updated_thumbnail_info)
+        return send_session_request(self._session, r).json()
