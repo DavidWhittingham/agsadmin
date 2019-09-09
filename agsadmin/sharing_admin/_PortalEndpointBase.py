@@ -23,8 +23,8 @@ class PortalEndpointBase(EndpointBase):
 
     __metaclass__ = abc.ABCMeta
 
-    @staticmethod
-    def _create_operation_request(endpoint, operation=None, method="POST", data=None, files=None):
+    @classmethod
+    def _create_operation_request(cls, endpoint, operation=None, method="POST", data=None, files=None):
         """
         Creates an operation request against a given ArcGIS Server endpoint.
 
@@ -55,16 +55,19 @@ class PortalEndpointBase(EndpointBase):
             data = encoded_data
 
             # determine if we need to take any data paramaters and send them as files
-            if "thumbnail" in data and not data["thumbnail"] is None:
-                thumbnail_path = data["thumbnail"]
-                files.append(("thumbnail", (os.path.basename(thumbnail_path), open(thumbnail_path, "rb"),
-                                            mimetypes.guess_type(thumbnail_path, False)[0])))
-                del data["thumbnail"]
+            cls._move_data_to_files(data, files, "file", "thumbnail")
 
-        return Request(
-            method,
-            "{endpoint}/{operation}".format(
-                endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
-                operation=operation if operation else ""),
-            data=data,
-            files=files if len(files) > 0 else None)
+        return Request(method,
+                       "{endpoint}/{operation}".format(
+                           endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
+                           operation=operation if operation else ""),
+                       data=data,
+                       files=files if len(files) > 0 else None)
+
+    @staticmethod
+    def _move_data_to_files(data, files, *args):
+        for key in args:
+            if key in data and not data[key] is None:
+                p = data[key]
+                files.append((key, (os.path.basename(p), open(p, "rb"), mimetypes.guess_type(p, False)[0])))
+                del data[key]
