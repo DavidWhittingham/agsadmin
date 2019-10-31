@@ -2,7 +2,10 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
+from ..._utils import send_session_request
 from .Service import Service
+
+from enum import Enum
 
 _SERVICE_TYPE = "MapServer"
 
@@ -13,5 +16,21 @@ class MapServer(Service):
     Allows you to perfrom typical administrative functions on the service.
     """
 
+    class InstanceType(Enum):
+        DEDICATED = "ArcObjects11"
+        SHARED = "DMaps"
+
     def __init__(self, requests_session, server_url, service_name, folder_name = None):
         super().__init__(requests_session, server_url, service_name, folder_name, _SERVICE_TYPE)
+
+    def set_instance_type(self, instance_type):
+        return send_session_request(
+            self._session,
+            self._create_operation_request(
+                self._url_full,
+                "changeProvider",
+                data = {
+                    "provider": self.InstanceType(instance_type).value
+                }
+            )
+        ).json()
