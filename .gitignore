@@ -45,3 +45,4 @@ nosetests.xml
 # Repo Specific
 /.vscode
 /venvs
+/.venvs
