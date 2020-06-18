@@ -3,43 +3,25 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 from ..._utils import send_session_request
-from .._PortalEndpointBase import PortalEndpointBase
+from ._ItemBase import ItemBase
 
 
-class Item(PortalEndpointBase):
-    @property
-    def id(self):
-        return self._pdata["id"]
+class Item(ItemBase):
 
-    @property
-    def _url_full(self):
-        return "{0}/items/{1}".format(self._url_base, self.id)
+    def get_data(self):
+        r = self._create_operation_request(self, "data", method="POST")
+        response = send_session_request(self._session, r)
+        try:
+            return response.json()
+        except ValueError as ve:
+            return response.content
+    
+    def get_data_as_zip(self):
+        r = self._create_operation_request(self, "data", method="POST")
+        r.data = {"f": "zip"}
+        return send_session_request(self._session, r).content
 
-    def __init__(self, requests_session, url_base, item_id):
-        super().__init__(requests_session, url_base)
-
-        self._pdata = {"id": item_id}
-
-    def get_properties(self):
-        """
-        Gets the properties of the item.
-        """
-        return self._get()
-
-    def share(self, everyone, org, groups, confirm_item_control):
-        r = self._create_operation_request(self, "share", method="POST")
-
-        r.data = {"everyone": everyone == True or False, "org": org == True or False}
-
-        if groups != None:
-            r.data["groups"] = ",".join(groups)
-
-        if confirm_item_control != None:
-            r.data["confirmItemControl"] = confirm_item_control == True or False
-
-        return send_session_request(self._session, r).json()
-
-    def unshare(self, groups):
-        r = self._create_operation_request(self, "unshare", method="POST", data={"groups": ",".join(groups)})
-
+    def get_dependencies(self):
+        r = self._create_operation_request(self, "dependencies", method="POST")
+        r.data = {"f": "json"}
         return send_session_request(self._session, r).json()

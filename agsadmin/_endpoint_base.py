@@ -44,8 +44,8 @@ class EndpointBase(object):
         """
         return
 
-    def _get(self):
-        return send_session_request(self._session, self._create_operation_request(self, method="GET")).json()
+    def _get(self, operation=None):
+        return send_session_request(self._session, self._create_operation_request(self, operation=operation, method="GET")).json()
 
     @staticmethod
     def _create_operation_request(endpoint, operation=None, method="POST", data=None, files=None):

@@ -15,7 +15,6 @@ class SharingAdmin(AdminBase):
     """
     Provides a proxy object for an ArcGIS Portal instance, communicating with the Sharing API.
     """
-
     @property
     def content(self):
         return self._content
@@ -45,7 +44,8 @@ class SharingAdmin(AdminBase):
                  utc_delta=tz.tzlocal().utcoffset(datetime.now()),
                  proxy=None,
                  encrypt=True,
-                 verify=True):
+                 verify=True,
+                 generate_token_url=None):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
@@ -89,7 +89,8 @@ class SharingAdmin(AdminBase):
         :type encrypt: bool or str
         """
 
-        super().__init__(hostname, username, password, instance_name, port, use_ssl, utc_delta, proxy, encrypt, verify)
+        super().__init__(hostname, username, password, instance_name, port, use_ssl, utc_delta, proxy, encrypt, verify,
+                         generate_token_url)
 
         # setup sub-modules/classes
         self._content = Content(self._session, self.url)

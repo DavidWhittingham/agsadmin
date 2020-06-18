@@ -3,10 +3,10 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 from ...._utils import send_session_request
-from ..Item import Item
+from .._ItemBase import ItemBase
 
 
-class UserItem(Item):
+class UserItem(ItemBase):
     @property
     def username(self):
         return self._pdata["username"]
@@ -38,7 +38,7 @@ class UserItem(Item):
         """
         Gets the sharing details of the item.
         """
-        return self._get()["sharing"]
+        return self._get().get("sharing")
 
     def update(self, updated_item_info):
         r = self._create_operation_request(self, "update", method="POST", data=updated_item_info)

@@ -11,6 +11,7 @@ from rsa import PublicKey, encrypt
 
 JSON_DECODE_ERROR = "Unknown server response, error parsing server response as JSON."
 
+
 def get_public_key(public_key_url):
     """
     Gets the ArcGIS Server REST Admin API public key, given the page address.
@@ -26,6 +27,7 @@ def get_public_key(public_key_url):
     r["publicKey"] = int(r["publicKey"], 16)
     r["modulus"] = int(r["modulus"], 16)
     return r
+
 
 def encrypt_request_data(data_dict, key, modulus):
     """
@@ -51,6 +53,7 @@ def encrypt_request_data(data_dict, key, modulus):
 
     rpk = PublicKey(modulus, key)
     return {key: b2a_hex(encrypt(bytes(value, "utf-8"), rpk)) for key, value in iteritems(data_dict)}
+
 
 def send_session_request(session, request, ags_operation=True):
     """
@@ -78,6 +81,7 @@ def send_session_request(session, request, ags_operation=True):
     r.raise_for_status()
     return r
 
+
 def decode_ags_operation(response, **kwargs):
     """
     Because Esri don't know how to write a REST service correctly (i.e. one that uses HTTP error codes in the response
@@ -100,9 +104,9 @@ def decode_ags_operation(response, **kwargs):
 
     return response
 
+
 def get_instance_url_base(protocol, hostname, port, instance):
-    return "{0}://{1}{2}/{3}".format(
-        protocol,
-        hostname,
-        "" if port == 80 else ":%s" % port,
-        instance)
+    if instance:
+        return "{0}://{1}{2}/{3}".format(protocol, hostname, "" if port in (80, 443) else ":%s" % port, instance)
+    else:
+        return "{0}://{1}{2}".format(protocol, hostname, "" if port in (80, 443) else ":%s" % port)

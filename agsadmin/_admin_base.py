@@ -12,6 +12,7 @@ from ._auth import _RestAdminAuth
 from ._endpoint_base import EndpointBase
 from ._utils import get_instance_url_base, send_session_request
 
+
 class AdminBase(EndpointBase):
     """
     Base class for all ArcGIS Server interactive endpoints.  Contains abstract items for dealing with service
@@ -32,17 +33,8 @@ class AdminBase(EndpointBase):
     def username(self):
         return self._pdata["username"]
 
-    def __init__(self,
-                 hostname,
-                 username,
-                 password,
-                 instance_name,
-                 port,
-                 use_ssl,
-                 utc_delta,
-                 proxy,
-                 encrypt,
-                 verify=True):
+    def __init__(self, hostname, username, password, instance_name, port, use_ssl, utc_delta, proxy, encrypt, verify,
+                 generate_token_url):
         """
         :param hostname: The hostname (or fully qualified domain name) of the ArcGIS Server.
         :type hostname: str
@@ -80,33 +72,38 @@ class AdminBase(EndpointBase):
         :param verify: Is set to True (default), which causes SSL certificates to be verified.  Can be set to false
         to disable verification, or set to the path of a CA_BUNDLE file, or to a directory with certifcates of a
         trusted certificate authority, to use for validating certificates.
-        :type encrypt: bool or str
+        :type verify: bool or str
+
+        :param generate_token_url: Allows a specific URL to be set for token generation.  This is useful for connecting
+        to ArcGIS Online, which has no 'rest/info' endpoint.
+        :type generate_token_url: str
         """
 
-        self._pdata = {
-            "username": username
-        }
+        self._pdata = {"username": username}
 
         protocol = "https" if use_ssl else "http"
 
         # setup the requests session
-        proxies = { protocol: proxy } if proxy else {}
+        proxies = {protocol: proxy} if proxy else {}
         s = Session()
         s.verify = verify
-        s.params = { "f": "json" }
+        s.params = {"f": "json"}
         s.proxies = proxies
 
         # call super constructor with session and instance URL
         super().__init__(s, get_instance_url_base(protocol, hostname, port, instance_name))
 
-        # Resolve the generate token endpoint from /arcgis/rest/info
-        generate_token_url = None
-        ags_info = self.get_server_info()
+        if not generate_token_url:
+            # Resolve the generate token endpoint from /<instance_name>/rest/info
+            generate_token_url = None
+            ags_info = self.get_server_info()
 
-        if "authInfo" in ags_info and "isTokenBasedSecurity" in ags_info["authInfo"]:
-            # token auth in use, setup auto-auth on requests on the session
-            generate_token_url = ags_info["authInfo"]["tokenServicesUrl"]
+            if "authInfo" in ags_info and "isTokenBasedSecurity" in ags_info["authInfo"]:
+                # token auth in use
+                generate_token_url = ags_info["authInfo"]["tokenServicesUrl"]
 
+        if generate_token_url:
+            # setup auto-auth on requests on the session
             self._session.auth = _RestAdminAuth(
                 username,
                 password,
@@ -116,15 +113,7 @@ class AdminBase(EndpointBase):
                 proxies=proxies,
                 client="referer" if "/sharing" in generate_token_url else "requestip",
                 referer=self._url_full if "/sharing" in generate_token_url else None,
-                verify=verify
-            )
+                verify=verify)
 
     def get_server_info(self):
-        return send_session_request(
-            self._session,
-            Request(
-                "GET",
-                "{0}/rest/info".format(self._url_base)
-            ),
-            True
-        ).json()
+        return send_session_request(self._session, Request("GET", "{0}/rest/info".format(self._url_base)), True).json()
