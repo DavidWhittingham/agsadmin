@@ -13,8 +13,8 @@ def build():
 
 @task
 def createVenvs():
-    venv(VENV_BUILD).create()
-    venv(VENV_TEST).create()
+    venv(VENV_BUILD).create("--no-setuptools")
+    venv(VENV_TEST).create("--no-setuptools")
 
 
 @task
@@ -32,11 +32,13 @@ def test():
 @task
 def updatePackages():
     with venv(VENV_BUILD):
+        pip(r"install -U setuptools^<45")
         pip(r"install -U pip")
         pip(r"install -U -r requirements.build.txt")
         pip(r"install -U -r requirements.txt")
 
     with venv(VENV_TEST):
+        pip(r"install -U setuptools^<45")
         pip(r"install -U pip")
         pip(r"install -U -r requirements.test.txt")
         pip(r"install -U -r requirements.txt")
