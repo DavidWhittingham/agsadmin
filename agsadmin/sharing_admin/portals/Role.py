@@ -61,7 +61,7 @@ class Role(PortalEndpointBase):
         """Set the privileges for the role."""
 
         r = self._create_operation_request(self, "setPrivileges", data={
-            "privileges": privileges
+            "privileges": {"privileges": privileges}
         })
         response = send_session_request(self._session, r).json()
 
