@@ -5,8 +5,8 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from ....._endpoint_base import EndpointBase
 from ....._utils import send_session_request
 
-class Extensions(EndpointBase):
 
+class Extensions(EndpointBase):
     def __init__(self, requests_session, server_url):
         super().__init__(requests_session, server_url)
 
@@ -20,14 +20,8 @@ class Extensions(EndpointBase):
         """
 
         return send_session_request(
-            self._session, 
-            self._create_operation_request(
-                self,
-                operation = "register",
-                method = "POST",
-                data = { "id": item_id }
-            )
-        ).json()
+            self._session,
+            self._create_operation_request(self, operation="register", method="POST", data={"id": item_id})).json()
 
     def unregister(self, extension_name):
         """
@@ -35,11 +29,8 @@ class Extensions(EndpointBase):
         """
 
         return send_session_request(
-            self._session, 
-            self._create_operation_request(
-                self,
-                operation = "unregister",
-                method = "POST",
-                data = { "extensionFilename": extension_name }
-            )
-        ).json()
+            self._session,
+            self._create_operation_request(self,
+                                           operation="unregister",
+                                           method="POST",
+                                           data={"extensionFilename": extension_name})).json()

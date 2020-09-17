@@ -8,6 +8,7 @@ import json
 
 from future.utils import iteritems
 from requests import Request
+from requests_toolbelt import MultipartEncoder
 
 from ._utils import send_session_request
 
@@ -45,7 +46,8 @@ class EndpointBase(object):
         return
 
     def _get(self, operation=None):
-        return send_session_request(self._session, self._create_operation_request(self, operation=operation, method="GET")).json()
+        return send_session_request(self._session,
+                                    self._create_operation_request(self, operation=operation, method="GET")).json()
 
     @staticmethod
     def _create_operation_request(endpoint, operation=None, method="POST", data=None, files=None):
@@ -76,10 +78,24 @@ class EndpointBase(object):
                     encoded_data[key] = value
             data = encoded_data
 
-        return Request(
-            method,
-            "{endpoint}/{operation}".format(
-                endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
-                operation=operation if operation else ""),
-            data=data,
-            files=files)
+        if files:
+            # upload using the multipart encoder
+
+            data_to_send = {}
+            if data:
+                data_to_send.update(data)
+            data_to_send.update(files)
+            m = MultipartEncoder(fields=data_to_send)
+
+            return Request(method,
+                           "{endpoint}/{operation}".format(
+                               endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
+                               operation=operation if operation else ""),
+                           data=m,
+                           headers={"Content-Type": m.content_type})
+
+        return Request(method,
+                       "{endpoint}/{operation}".format(
+                           endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
+                           operation=operation if operation else ""),
+                       data=data)

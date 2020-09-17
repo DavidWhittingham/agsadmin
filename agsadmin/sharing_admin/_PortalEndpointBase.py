@@ -11,6 +11,7 @@ import os
 from future.utils import iteritems
 from requests import Request
 from requests.utils import to_key_val_list
+from requests_toolbelt import MultipartEncoder
 
 from .._endpoint_base import EndpointBase
 
@@ -54,15 +55,28 @@ class PortalEndpointBase(EndpointBase):
                     encoded_data[key] = value
             data = encoded_data
 
+        if files:
             # determine if we need to take any data paramaters and send them as files
             cls._move_data_to_files(data, files, "file", "thumbnail")
+
+            data_to_send = {}
+            if data:
+                data_to_send.update(data)
+            data_to_send.update(files)
+            m = MultipartEncoder(fields=data_to_send)
+
+            return Request(method,
+                           "{endpoint}/{operation}".format(
+                               endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
+                               operation=operation if operation else ""),
+                           data=m,
+                           headers={"Content-Type": m.content_type})
 
         return Request(method,
                        "{endpoint}/{operation}".format(
                            endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
                            operation=operation if operation else ""),
-                       data=data,
-                       files=files if len(files) > 0 else None)
+                       data=data)
 
     @staticmethod
     def _move_data_to_files(data, files, *args):
