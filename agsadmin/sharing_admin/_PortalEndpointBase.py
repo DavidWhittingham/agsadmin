@@ -40,43 +40,13 @@ class PortalEndpointBase(EndpointBase):
         :type method: str
         """
 
+        data = data or {}
         files = to_key_val_list(files or {})
 
-        # data may come in as an object containing other complex objects types (e.g. strings, lists), these should be
-        # encoded to JSON strings
-        if not data == None:
-            encoded_data = {}
-            for key, value in iteritems(data):
-                if isinstance(value, collections.Mapping):
-                    encoded_data[key] = json.dumps(value)
-                elif isinstance(value, list):
-                    encoded_data[key] = json.dumps(value)
-                else:
-                    encoded_data[key] = value
-            data = encoded_data
+        # determine if we need to take any data paramaters and send them as files
+        cls._move_data_to_files(data, files, "file", "thumbnail")
 
-        if files:
-            # determine if we need to take any data paramaters and send them as files
-            cls._move_data_to_files(data, files, "file", "thumbnail")
-
-            data_to_send = {}
-            if data:
-                data_to_send.update(data)
-            data_to_send.update(files)
-            m = MultipartEncoder(fields=data_to_send)
-
-            return Request(method,
-                           "{endpoint}/{operation}".format(
-                               endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
-                               operation=operation if operation else ""),
-                           data=m,
-                           headers={"Content-Type": m.content_type})
-
-        return Request(method,
-                       "{endpoint}/{operation}".format(
-                           endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
-                           operation=operation if operation else ""),
-                       data=data)
+        return super()._create_operation_request(endpoint, operation, method, data, files)
 
     @staticmethod
     def _move_data_to_files(data, files, *args):

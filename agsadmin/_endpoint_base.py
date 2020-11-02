@@ -5,6 +5,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 import abc
 import collections
 import json
+import numbers
 
 from future.utils import iteritems
 from requests import Request
@@ -49,8 +50,8 @@ class EndpointBase(object):
         return send_session_request(self._session,
                                     self._create_operation_request(self, operation=operation, method="GET")).json()
 
-    @staticmethod
-    def _create_operation_request(endpoint, operation=None, method="POST", data=None, files=None):
+    @classmethod
+    def _create_operation_request(cls, endpoint, operation=None, method="POST", data=None, files=None):
         """
         Creates an operation request against a given ArcGIS Server endpoint.
 
@@ -65,25 +66,12 @@ class EndpointBase(object):
         :type method: str
         """
 
-        # data may come in as an object containing other complex objects types (e.g. strings, lists), these should be
-        # encoded to JSON strings
-        if not data == None:
-            encoded_data = {}
-            for key, value in iteritems(data):
-                if isinstance(value, collections.Mapping):
-                    encoded_data[key] = json.dumps(value)
-                elif isinstance(value, list):
-                    encoded_data[key] = json.dumps(value)
-                else:
-                    encoded_data[key] = value
-            data = encoded_data
-
         if files:
             # upload using the multipart encoder
 
             data_to_send = {}
             if data:
-                data_to_send.update(data)
+                data_to_send.update(cls._encode_request_data(data, True))
             data_to_send.update(files)
             m = MultipartEncoder(fields=data_to_send)
 
@@ -98,4 +86,21 @@ class EndpointBase(object):
                        "{endpoint}/{operation}".format(
                            endpoint=endpoint._url_full if isinstance(endpoint, EndpointBase) else endpoint,
                            operation=operation if operation else ""),
-                       data=data)
+                       data=cls._encode_request_data(data, False))
+
+    @staticmethod
+    def _encode_request_data(data, encode_for_multipart=False):
+        if data == None:
+            return None
+
+        encoded_data = {}
+        for key, value in iteritems(data):
+            if isinstance(value, collections.Mapping):
+                encoded_data[key] = json.dumps(value)
+            elif isinstance(value, list):
+                encoded_data[key] = json.dumps(value)
+            elif isinstance(value, numbers.Number) and encode_for_multipart:
+                encoded_data[key] = repr(value)
+            else:
+                encoded_data[key] = str(value) if encode_for_multipart == True else value
+        return encoded_data
