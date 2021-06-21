@@ -20,6 +20,18 @@ class UserItem(ItemBase):
 
         self._pdata["username"] = username
 
+    def add_part(self, item_part):
+        r = self._create_operation_request(self, "addPart", method="POST", data=item_part)
+        return send_session_request(self._session, r).json()
+
+    def check_status(self, status_request):
+        r = self._create_operation_request(self, "status", method="POST", data=status_request)
+        return send_session_request(self._session, r).json()
+
+    def commit(self):
+        r = self._create_operation_request(self, "commit", method="POST")
+        return send_session_request(self._session, r).json()
+
     def move(self, folder_id):
         r = self._create_operation_request(self, "move", method="POST", data={"folder": folder_id})
         return send_session_request(self._session, r).json()

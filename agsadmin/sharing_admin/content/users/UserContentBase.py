@@ -25,6 +25,13 @@ class UserContentBase(PortalEndpointBase):
         r = self._create_operation_request(self, "addItem", method="POST", data=new_item)
         return send_session_request(self._session, r).json()
 
+    def get_item(self, item_id):
+        """
+        Gets a link to a content item in the portal owned by a particular user.
+        """
+
+        return UserItem(self._session, self._url_full, self.username, item_id)
+
     def list_items(self):
         """
         Gets a list of item details.
@@ -32,9 +39,10 @@ class UserContentBase(PortalEndpointBase):
 
         return self._get().get("items", [])
 
-    def get_item(self, item_id):
-        """
-        Gets a link to a content item in the portal owned by a particular user.
-        """
+    def publish(self, item_info):
+        r = self._create_operation_request(self, "publish", method="POST", data=item_info)
+        return send_session_request(self._session, r).json()
 
-        return UserItem(self._session, self._url_full, self.username, item_id)
+    def replace_service(self, replace_service_request):
+        r = self._create_operation_request(self, "replaceService", method="POST", data=replace_service_request)
+        return send_session_request(self._session, r).json()
