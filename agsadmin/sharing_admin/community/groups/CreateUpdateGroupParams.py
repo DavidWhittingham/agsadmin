@@ -2,9 +2,11 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-import copy
-
+# standard lib imports
 from enum import Enum
+
+# local imports
+from ..._ParamsBase import ParamsBase
 
 
 class GroupAccess(Enum):
@@ -27,12 +29,8 @@ class GroupSortOrder(Enum):
     DESCENDING = "desc"
 
 
-class CreateUpdateGroupParams(object):
-
-    _props = None
-
-    def __init__(self):
-        self._props = {}
+class CreateUpdateGroupParams(ParamsBase):
+    """Holds parameter values for the "create" and "update" group functions."""
 
     @property
     def access(self):
@@ -58,7 +56,7 @@ class CreateUpdateGroupParams(object):
         if len(value) > 250:
             raise ValueError("Contact information must be no longer than 250 characters.")
 
-        self._props["title"] = value
+        self._props["phone"] = value
 
     @property
     def description(self):
@@ -164,9 +162,3 @@ class CreateUpdateGroupParams(object):
             raise ValueError("Title must be no longer than 250 characters.")
 
         self._props["title"] = value
-
-    def _get_params(self):
-        return copy.deepcopy(self._props)
-
-    def _set_params(self, params):
-        self._props = copy.deepcopy(params)
