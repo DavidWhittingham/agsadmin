@@ -5,11 +5,13 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from datetime import datetime
 from dateutil import tz
 
+from agsadmin.sharing_admin.SearchParams import SearchParams
+
 from .sharing_admin.content import Content
 from .sharing_admin.community import Community
 from .sharing_admin.portals import Portals
 from ._admin_base import AdminBase
-
+from ._utils import send_session_request
 
 class SharingAdmin(AdminBase):
     """
@@ -96,3 +98,20 @@ class SharingAdmin(AdminBase):
         self._content = Content(self._session, self.url)
         self._community = Community(self._session, self.url)
         self._portals = Portals(self._session, self.url)
+
+    def search(self, search_params):
+        """Searches for content items in Portal.
+
+        Args:
+            search_params (agsadmin.sharing_admin.SearchParams): The search parameters
+
+        Returns:
+            dict: The JSON search response.
+        """
+
+        search_params = search_params._get_params() if isinstance(
+            search_params, SearchParams) else search_params
+
+        r = self._create_operation_request(self._url_full, "search", method="POST", data=search_params)
+
+        return send_session_request(self._session, r).json()

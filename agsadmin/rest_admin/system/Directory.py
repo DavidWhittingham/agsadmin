@@ -34,7 +34,7 @@ class Directory(EndpointBase):
 
     @cleanup_mode.setter
     def cleanup_mode(self, value):
-        self._pdata["cleanup_mode"] = CleanupMode(value).value
+        self._pdata["cleanup_mode"] = self.CleanupMode(value).value
 
     @property
     def description(self):

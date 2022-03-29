@@ -16,6 +16,11 @@ class Item(ItemBase):
         except ValueError as ve:
             return response.content
     
+    def get_related_items(self, related_items_params):
+        r = self._create_operation_request(self, "relatedItems", method="POST")
+        r.data = {"f": "zip"}
+        return send_session_request(self._session, r).content
+    
     def get_data_as_zip(self):
         r = self._create_operation_request(self, "data", method="POST")
         r.data = {"f": "zip"}
