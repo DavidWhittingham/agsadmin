@@ -1,4 +1,4 @@
 configparser<5 ; python_version<'3.0'
 zipp==1.1.0 ; python_version<'3.0' # later versions drop support for Python 2
 pytest>=3.3.1,<5
-pytest_cov>=2.5.1
+pytest-cov>=2.7.1,<3

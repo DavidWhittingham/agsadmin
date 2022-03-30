@@ -4,8 +4,8 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ...._utils import send_session_request
 from ..._PortalEndpointBase import PortalEndpointBase
-from .CreateUpdateGroupParams import CreateUpdateGroupParams
-from .Group import Group
+from . import CreateGroupParams
+from . import Group
 
 
 class Groups(PortalEndpointBase):
@@ -22,7 +22,7 @@ class Groups(PortalEndpointBase):
     def create(self, create_group_params):
 
         create_group_params = create_group_params._get_params() if isinstance(
-            create_group_params, CreateUpdateGroupParams) else create_group_params
+            create_group_params, CreateGroupParams) else create_group_params
 
         r = self._create_operation_request(self._url_base, "createGroup", method="POST", data=create_group_params)
 

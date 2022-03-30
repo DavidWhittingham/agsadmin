@@ -4,7 +4,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ...._utils import send_session_request
 from ..._PortalEndpointBase import PortalEndpointBase
-from .CreateUpdateGroupParams import CreateUpdateGroupParams
+from . import UpdateGroupParams
 
 
 class Group(PortalEndpointBase):
@@ -27,16 +27,13 @@ class Group(PortalEndpointBase):
         """
         return self._get()
 
-    def update(self, update_group_params, clear_empty_fields=False):
+    def update(self, update_group_params):
         """
         Updates the group properties.
         """
 
         update_group_params = update_group_params._get_params() if isinstance(
-            update_group_params, CreateUpdateGroupParams) else update_group_params.copy()
-
-        if not "clearEmptyFields" in update_group_params:
-            update_group_params["clearEmptyFields"] = clear_empty_fields
+            update_group_params, UpdateGroupParams) else update_group_params.copy()
 
         r = self._create_operation_request(self, "update", method="POST", data=update_group_params)
 

@@ -1,2 +1,3 @@
-from .CreateUpdateGroupParams import CreateUpdateGroupParams, GroupAccess, GroupSortField, GroupSortOrder
+from .CreateGroupParams import CreateGroupParams, GroupAccess, GroupSortField, GroupSortOrder
 from .Groups import Groups
+from .UpdateGroupParams import UpdateGroupParams

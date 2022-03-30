@@ -4,6 +4,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ...._utils import send_session_request
 from .._ItemBase import ItemBase
+from .ShareUserItemParams import ShareUserItemParams
 
 
 class UserItem(ItemBase):
@@ -51,6 +52,12 @@ class UserItem(ItemBase):
         Gets the sharing details of the item.
         """
         return self._get().get("sharing")
+
+    def share(self, share_user_item_params):
+        share_user_item_params = share_user_item_params._get_params() if isinstance(
+            share_user_item_params, ShareUserItemParams) else share_user_item_params
+
+        return super().share(share_user_item_params)
 
     def update(self, updated_item_info):
         r = self._create_operation_request(self, "update", method="POST", data=updated_item_info)

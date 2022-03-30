@@ -35,7 +35,7 @@ class ItemBase(PortalEndpointBase):
         r = self._create_operation_request(self, "info/{}".format(props["thumbnail"]), method="GET")
 
         return send_session_request(self._session, r, ags_operation=False).content
-    
+
     def set_content_status(self, set_content_status_params):
         set_content_status_params = set_content_status_params._get_params() if isinstance(
             set_content_status_params, SetContentStatusParams) else set_content_status_params
@@ -44,20 +44,12 @@ class ItemBase(PortalEndpointBase):
 
         return send_session_request(self._session, r).json()
 
-    def share(self, everyone, org, groups, confirm_item_control):
-        r = self._create_operation_request(self, "share", method="POST")
-
-        r.data = {"everyone": everyone == True or False, "org": org == True or False}
-
-        if groups != None:
-            r.data["groups"] = ",".join(groups)
-
-        if confirm_item_control != None:
-            r.data["confirmItemControl"] = confirm_item_control == True or False
+    def share(self, share_item_params):
+        r = self._create_operation_request(self, "share", method="POST", data=share_item_params)
 
         return send_session_request(self._session, r).json()
 
-    def unshare(self, groups):
-        r = self._create_operation_request(self, "unshare", method="POST", data={"groups": ",".join(groups)})
+    def unshare(self, unshare_item_params):
+        r = self._create_operation_request(self, "unshare", method="POST", data=unshare_item_params)
 
         return send_session_request(self._session, r).json()

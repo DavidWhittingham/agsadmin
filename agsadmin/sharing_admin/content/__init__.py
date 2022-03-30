@@ -4,3 +4,5 @@ from .ItemRelationshipType import ItemRelationshipType
 from .ItemType import ItemType
 from .RelatedItemsParams import RelatedItemsParams
 from .SetContentStatusParams import SetContentStatusParams
+from .ShareItemParams import ShareItemParams
+from .UnshareItemParams import UnshareItemParams

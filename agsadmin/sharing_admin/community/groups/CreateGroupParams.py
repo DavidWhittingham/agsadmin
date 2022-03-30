@@ -29,9 +29,8 @@ class GroupSortOrder(Enum):
     DESCENDING = "desc"
 
 
-class CreateUpdateGroupParams(ParamsBase):
+class CreateGroupParams(ParamsBase):
     """Holds parameter values for the "create" and "update" group functions."""
-
     @property
     def access(self):
         """Gets or sets the access level for the group."""
