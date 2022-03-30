@@ -5,6 +5,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from ..._utils import send_session_request
 from .._PortalEndpointBase import PortalEndpointBase
 from .SetContentStatusParams import SetContentStatusParams
+from .UnshareItemParams import UnshareItemParams
 
 
 class ItemBase(PortalEndpointBase):
@@ -50,6 +51,9 @@ class ItemBase(PortalEndpointBase):
         return send_session_request(self._session, r).json()
 
     def unshare(self, unshare_item_params):
+        unshare_item_params = unshare_item_params._get_params() if isinstance(
+            unshare_item_params, UnshareItemParams) else unshare_item_params
+
         r = self._create_operation_request(self, "unshare", method="POST", data=unshare_item_params)
 
         return send_session_request(self._session, r).json()
