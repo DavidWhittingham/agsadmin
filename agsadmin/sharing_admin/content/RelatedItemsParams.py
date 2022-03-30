@@ -2,12 +2,6 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-try:
-    from collections.abc import Sequence
-except ImportError:
-    # try older import location
-    from collections import Sequence
-
 # third-party lib imports
 from past.builtins import basestring
 
