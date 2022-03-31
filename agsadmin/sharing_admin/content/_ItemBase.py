@@ -4,7 +4,6 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ..._utils import send_session_request
 from .._PortalEndpointBase import PortalEndpointBase
-from .SetContentStatusParams import SetContentStatusParams
 from .UnshareItemParams import UnshareItemParams
 
 
@@ -36,14 +35,6 @@ class ItemBase(PortalEndpointBase):
         r = self._create_operation_request(self, "info/{}".format(props["thumbnail"]), method="GET")
 
         return send_session_request(self._session, r, ags_operation=False).content
-
-    def set_content_status(self, set_content_status_params):
-        set_content_status_params = set_content_status_params._get_params() if isinstance(
-            set_content_status_params, SetContentStatusParams) else set_content_status_params
-
-        r = self._create_operation_request(self, "setContentStatus", method="POST", data=set_content_status_params)
-
-        return send_session_request(self._session, r).json()
 
     def share(self, share_item_params):
         r = self._create_operation_request(self, "share", method="POST", data=share_item_params)
