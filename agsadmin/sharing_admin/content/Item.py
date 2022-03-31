@@ -23,7 +23,7 @@ class Item(ItemBase):
             related_items_params, RelatedItemsParams) else related_items_params
 
         r = self._create_operation_request(self, "relatedItems", method="POST", data=related_items_params)
-        return send_session_request(self._session, r).content
+        return send_session_request(self._session, r).json()
 
     def get_data_as_zip(self):
         r = self._create_operation_request(self, "data", method="POST")
