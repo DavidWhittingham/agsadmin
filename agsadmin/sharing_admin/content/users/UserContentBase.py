@@ -4,6 +4,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ...._utils import send_session_request
 from ..._PortalEndpointBase import PortalEndpointBase
+from .ListItemsParams import ListItemsParams
 from .UserItem import UserItem
 
 
@@ -32,12 +33,16 @@ class UserContentBase(PortalEndpointBase):
 
         return UserItem(self._session, self._url_full, self.username, item_id)
 
-    def list_items(self):
+    def list_items(self, list_items_params=None):
         """
         Gets a list of item details.
         """
 
-        return self._get().get("items", [])
+        list_items_params = None if list_items_params == None else list_items_params._get_params() if isinstance(
+            list_items_params, ListItemsParams) else list_items_params
+
+        r = self._create_operation_request(self, data=list_items_params)
+        return send_session_request(self._session, r).json()
 
     def publish(self, item_info):
         r = self._create_operation_request(self, "publish", method="POST", data=item_info)

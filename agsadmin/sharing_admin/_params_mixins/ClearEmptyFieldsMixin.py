@@ -2,12 +2,8 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-# standard lib imports
-from enum import Enum
-
 # local imports
 from ..._utils import truthy
-from .._ParamsBase import ParamsBase
 
 
 class ClearEmptyFieldsMixin(object):
