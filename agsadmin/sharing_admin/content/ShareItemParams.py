@@ -13,7 +13,6 @@ except ImportError:
 from past.builtins import basestring
 
 # local imports
-from ..._utils import truthy
 from .._ParamsBase import ParamsBase
 
 
@@ -21,23 +20,11 @@ class ShareItemParams(ParamsBase):
     """Holds parameter values for the "share" content item request."""
     @property
     def groups(self):
-        value = self._props.get("groups")
-
-        if not value:
-            return []
-
-        return value.split(",")
+        return self._get_nullable_csv_list("groups")
 
     @groups.setter
     def groups(self, value):
-        if isinstance(value, Sequence) and not isinstance(value, basestring):
-            # got some kind of list, process to JSON-native format
-            value = ",".join(value)
-
-        if value is None:
-            self._props.pop("groups", None)
-        else:
-            self._props["groups"] = value
+        self._set_nullable_csv_list("groups", value, lambda v: v.strip())
 
     @property
     def confirm_item_control(self):
@@ -45,8 +32,4 @@ class ShareItemParams(ParamsBase):
 
     @confirm_item_control.setter
     def confirm_item_control(self, value):
-        if value is None:
-            self._props.pop("confirmItemControl", None)
-        else:
-            value = truthy(value)
-            self._props["confirmItemControl"] = value
+        self._set_nullable_bool("confirmItemControl", value)

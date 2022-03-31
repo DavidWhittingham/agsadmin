@@ -52,6 +52,13 @@ class PortalEndpointBase(EndpointBase):
     def _move_data_to_files(data, files, *args):
         for key in args:
             if key in data and not data[key] is None:
-                p = data[key]
-                files.append((key, (os.path.basename(p), open(p, "rb"), mimetypes.guess_type(p, False)[0])))
-                del data[key]
+                p = data.pop(key)
+
+                # test if p is already a tuple
+                if type(p) is tuple:
+                    # assume already in correct format, expand and open
+                    (file_name, file_path, mime_type) = p
+                    files.append((key, (file_name, open(file_path, "rb"), mime_type)))
+                else:
+                    # try to guess filename/mimetype and provide file handler
+                    files.append((key, (os.path.basename(p), open(p, "rb"), mimetypes.guess_type(p, False)[0])))

@@ -108,16 +108,21 @@ def normalize_caseless(text):
     return text.upper().lower()
 
 
-def truthy(value):
+def truthy(value, nullable=False):
     """Gets a boolean value based on truthiness, explictly evaluating string content.
 
     Args:
         value (any): The truthy value to evaluate
     """
 
+    if nullable and value is None:
+        return None
+
     if isinstance(value, basestring):
         if caseless_equal(value, "true"):
             return True
+        elif nullable and value.strip() == "":
+            return None
         else:
             return False
 

@@ -2,9 +2,6 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, next, oct, open, pow, range, round, str,
                       super, zip)
 
-# local imports
-from ..._utils import truthy
-
 
 class ClearEmptyFieldsMixin(object):
     """Params mixin for 'clearEmptyFields'."""
@@ -12,17 +9,8 @@ class ClearEmptyFieldsMixin(object):
     def clear_empty_fields(self):
         """Gets or sets the clear empty status value for the request."""
 
-        value = self._props.get("clearEmptyFields")
-
-        if not value:
-            return None
-
-        return value
+        return self._props.get("clearEmptyFields")
 
     @clear_empty_fields.setter
     def clear_empty_fields(self, value):
-        if value is None:
-            self._props.pop("clearEmptyFields", None)
-        else:
-            value = truthy(value)
-            self._props["clearEmptyFields"] = value
+        self._set_nullable_bool("clearEmptyFields", value)

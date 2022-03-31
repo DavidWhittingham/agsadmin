@@ -5,6 +5,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from ...._utils import send_session_request
 from .._ItemBase import ItemBase
 from .ShareUserItemParams import ShareUserItemParams
+from .UpdateItemParams import UpdateItemParams
 
 
 class UserItem(ItemBase):
@@ -59,8 +60,10 @@ class UserItem(ItemBase):
 
         return super().share(share_user_item_params)
 
-    def update(self, updated_item_info):
-        r = self._create_operation_request(self, "update", method="POST", data=updated_item_info)
+    def update(self, updated_item_params):
+        updated_item_params = updated_item_params._get_params() if isinstance(updated_item_params,
+                                                                              UpdateItemParams) else updated_item_params
+        r = self._create_operation_request(self, "update", method="POST", data=updated_item_params)
         return send_session_request(self._session, r).json()
 
     def update_thumbnail(self, updated_thumbnail_info):

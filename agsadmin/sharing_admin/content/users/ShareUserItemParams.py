@@ -3,7 +3,6 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 # local imports
-from ...._utils import truthy
 from ..ShareItemParams import ShareItemParams
 
 
@@ -15,11 +14,7 @@ class ShareUserItemParams(ShareItemParams):
 
     @everyone.setter
     def everyone(self, value):
-        if value is None:
-            self._props.pop("everyone", None)
-        else:
-            value = truthy(value)
-            self._props["everyone"] = value
+        self._set_nullable_bool("everyone", value)
 
     @property
     def org(self):
@@ -27,8 +22,4 @@ class ShareUserItemParams(ShareItemParams):
 
     @org.setter
     def org(self, value):
-        if value is None:
-            self._props.pop("org", None)
-        else:
-            value = truthy(value)
-            self._props["org"] = value
+        self._set_nullable_bool("org", value)
