@@ -26,7 +26,16 @@ def decode_ags_operation(response, **kwargs):
     try:
         j = response.json()
 
-        if "code" in j:
+        # fuzzy check for Portal vs ArcGIS Server
+        error_dict = j.get("error", {})
+        if error_dict.get("code"):
+            # probably from Portal
+            error_code = error_dict["code"]
+            if 400 <= error_code < 600:
+                response.status_code = error_code
+                response.reason = error_dict.get("message", "")
+        elif "code" in j:
+            # probably from ArcGIS Server
             if 400 <= j["code"] < 600:
                 response.status_code = j["code"]
                 response.reason = " | ".join(j["messages"])
