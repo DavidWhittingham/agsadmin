@@ -5,7 +5,8 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 # standard lib imports
 from enum import Enum
 
+
 class ContentStatusType(Enum):
-    DEPRECATED = "public_authoritative"
+    DEPRECATED = "deprecated"
     ORG_AUTHORITATIVE = "org_authoritative"
     PUBLIC_AUTHORITATIVE = "public_authoritative"
