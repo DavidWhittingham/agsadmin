@@ -5,6 +5,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 from ..._utils import send_session_request
 from .._PortalEndpointBase import PortalEndpointBase
 from .UnshareItemParams import UnshareItemParams
+from .ListResourcesParams import ListResourcesParams
 
 
 class ItemBase(PortalEndpointBase):
@@ -35,6 +36,14 @@ class ItemBase(PortalEndpointBase):
         r = self._create_operation_request(self, "info/{}".format(props["thumbnail"]), method="GET")
 
         return send_session_request(self._session, r, ags_operation=False).content
+
+    def list_resources(self, list_resources_params):
+        list_resources_params = list_resources_params._get_params() if isinstance(
+            list_resources_params, ListResourcesParams) else list_resources_params
+
+        r = self._create_operation_request(self, "resources", method="POST", data=list_resources_params)
+
+        return send_session_request(self._session, r).json()
 
     def share(self, share_item_params):
         r = self._create_operation_request(self, "share", method="POST", data=share_item_params)

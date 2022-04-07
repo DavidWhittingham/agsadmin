@@ -3,11 +3,12 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 from ...._utils import send_session_request
+from .ReplaceServiceParams import ReplaceServiceParams
 from .UserContentBase import UserContentBase
 from .UserFolderContent import UserFolderContent
 
-class UserContent(UserContentBase):
 
+class UserContent(UserContentBase):
     def __init__(self, requests_session, url_base, username):
         super().__init__(requests_session, url_base, username)
 
@@ -19,9 +20,16 @@ class UserContent(UserContentBase):
         return self._get()["folders"]
 
     def create_folder(self, folder_name):
-        r = self._create_operation_request(self, "createFolder", method = "POST", data = {"title": folder_name})
+        r = self._create_operation_request(self, "createFolder", method="POST", data={"title": folder_name})
 
         return send_session_request(self._session, r).json()
 
     def get_folder(self, folder_id):
         return UserFolderContent(self._session, self._url_full, self.username, folder_id)
+
+    def replace_service(self, params):
+        params = params._get_params() if isinstance(params, ReplaceServiceParams) else params
+
+        r = self._create_operation_request(self, "replaceService", method="POST", data=params)
+
+        return send_session_request(self._session, r).json()

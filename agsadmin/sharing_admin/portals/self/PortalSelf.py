@@ -67,6 +67,11 @@ class PortalSelf(PortalEndpointBase):
             roles_json["start"], roles_json["num"], roles_json["total"], roles_json["nextStart"],
             [Role(self._session, "{}/roles".format(self._url_full), role_json) for role_json in roles_json["roles"]])
 
+    def is_service_name_available(self, params):
+        params = params._get_params() if isinstance(params, IsServiceNameAvailableParams) else params
+        r = self._create_operation_request(self, "isServiceNameAvailable", method="POST", data=params)
+        return send_session_request(self._session, r).json()
+
     def update(self, updated_portal_info):
         r = self._create_operation_request(self, "update", method="POST", data=updated_portal_info)
         return send_session_request(self._session, r).json()

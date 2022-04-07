@@ -4,6 +4,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from enum import Enum
 
+
 class ItemType(Enum):
 
     ###############
@@ -80,3 +81,17 @@ class ItemType(Enum):
     IWORK_NUMBERS = "iWork Numbers"
     REPORT_TEMPLATE = "Report Template"
     STATISTICAL_DATA_COLLECTION = "Statistical Data Collection"
+
+    ###################
+    # Desktop Content #
+    ###################
+
+    # Maps
+    MAP_DOCUMENT = "Map Document"
+    MAP_PACKAGE = "Map Package"
+    MOBILE_BASEMAP_PACKAGE = "Mobile Basemap Package"
+    MOBILE_MAP_PACKAGE = "Mobile Map Package"
+    TILE_PACKAGE = "Tile Package"
+    COMPACT_TILE_PACKAGE = "Compact Tile Package"
+    VECTOR_TILE_PACKAGE = "Vector Tile Package"
+    PROJECT_PACKAGE = "Project Package"

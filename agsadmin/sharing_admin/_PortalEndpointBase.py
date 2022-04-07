@@ -3,15 +3,11 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
                       super, zip)
 
 import abc
-import collections
-import json
 import mimetypes
 import os
 
-from future.utils import iteritems
-from requests import Request
 from requests.utils import to_key_val_list
-from requests_toolbelt import MultipartEncoder
+from past.builtins import basestring
 
 from .._endpoint_base import EndpointBase
 
@@ -57,8 +53,11 @@ class PortalEndpointBase(EndpointBase):
                 # test if p is already a tuple
                 if type(p) is tuple:
                     # assume already in correct format, expand and open
-                    (file_name, file_path, mime_type) = p
-                    files.append((key, (file_name, open(file_path, "rb"), mime_type)))
+                    (file_name, file_data, mime_type) = p
                 else:
-                    # try to guess filename/mimetype and provide file handler
-                    files.append((key, (os.path.basename(p), open(p, "rb"), mimetypes.guess_type(p, False)[0])))
+                    # assume input is a path, try to guess filename/mimetype and provide file handler
+                    file_name = os.path.basename(p)
+                    file_data = open(file_data, "rb")
+                    mime_type = mimetypes.guess_type(p, False)[0]
+
+                files.append((key, (file_name, file_data, mime_type)))
