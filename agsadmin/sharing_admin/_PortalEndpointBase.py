@@ -56,7 +56,7 @@ class PortalEndpointBase(EndpointBase):
                 else:
                     # assume input is a path, try to guess filename/mimetype and provide file handler
                     file_name = os.path.basename(p)
-                    file_data = open(file_data, "rb")
+                    file_data = open(p, "rb")
                     mime_type = mimetypes.guess_type(p, False)[0]
 
                 files.append((key, (file_name, file_data, mime_type)))
