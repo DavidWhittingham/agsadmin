@@ -7,7 +7,6 @@ import mimetypes
 import os
 
 from requests.utils import to_key_val_list
-from past.builtins import basestring
 
 from .._endpoint_base import EndpointBase
 

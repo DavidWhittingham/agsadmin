@@ -4,7 +4,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 from ...._utils import send_session_request
 from ..._PortalEndpointBase import PortalEndpointBase
-from . import UpdateGroupParams
+from .UpdateGroupParams import UpdateGroupParams
 
 
 class Group(PortalEndpointBase):
