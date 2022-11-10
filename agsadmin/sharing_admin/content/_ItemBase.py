@@ -36,6 +36,11 @@ class ItemBase(PortalEndpointBase):
         r = self._create_operation_request(self, "info/{}".format(props["thumbnail"]), method="GET")
 
         return send_session_request(self._session, r, ags_operation=False).content
+    
+    def get_resource(self, resource):
+        r = self._create_operation_request(self, "resources/{}".format(resource), method="GET")
+
+        return send_session_request(self._session, r, ags_operation=False).content
 
     def list_resources(self, list_resources_params):
         list_resources_params = list_resources_params._get_params() if isinstance(
