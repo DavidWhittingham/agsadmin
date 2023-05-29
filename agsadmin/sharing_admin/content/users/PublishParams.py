@@ -54,6 +54,16 @@ class PublishParams(ParamsBase):
         self._set_nullable("itemID", value)
 
     @property
+    def item_id_to_create(self):
+        """Gets or sets the item ID of the Portal Item to be published."""
+        
+        return self._props.get("itemIdToCreate")
+    
+    @item_id_to_create.setter
+    def item_id_to_create(self, value):
+        self._set_nullable("itemIdToCreate", value)
+
+    @property
     def output_type(self):
         """Gets or sets the output type of the published service."""
 
