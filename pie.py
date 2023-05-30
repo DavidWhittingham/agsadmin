@@ -4,7 +4,7 @@ pie - Python Interactive Executor
 Enables a user to execute predefined tasks that may accept parameters and options from the command line without any other required packages.
 Great for bootstrapping a development environment, and then interacting with it.
 """
-__VERSION__='0.3.0h'
+__VERSION__='0.3.0i'
 
 
 import inspect
@@ -64,7 +64,10 @@ class TaskWrapper(object):
 
     def __call__(self,*args,**kwargs):
         # get arg names and defaults from the function
-        (arg_names,varargs,keywords,defaults)=inspect.getargspec(self.fn)
+        if hasattr(inspect, "getfullargspec"):
+            (arg_names,varargs,keywords,defaults,_,_,_)=inspect.getfullargspec(self.fn)
+        else:
+            (arg_names,varargs,keywords,defaults)=inspect.getargspec(self.fn)
         # map defaults to an arg name
         defaults=dict(zip(arg_names[len(arg_names)-len(defaults):],defaults)) if defaults is not None else {}
         # map provided values to an arg name
@@ -261,6 +264,7 @@ class CmdContextManager(object):
         errorcode=CmdExecutor.cmd_fn(c)
         if errorcode!=0:
             raise cls.CmdError(errorcode,c)
+        return errorcode
 
     @classmethod
     def exit(cls):
@@ -656,16 +660,32 @@ def parseArguments(args):
                 i+=1
             else:
                 raise Exception('Unknown argument: {}'.format(arg))
+            i+=1
         else:
             mo=TASK_RE.match(arg)
             if mo:
                 taskArgs=mo.group('args')
                 taskArgs=taskArgs.split(',') if taskArgs else []
+                taskKwArgs={}
+                # and consume following -- args
+                i+=1
+                while i<len(args):
+                    arg=args[i]
+                    # kwargs must start with --
+                    if not arg.startswith('--'): break
+                    arg=arg[2:]
+                    if '=' in arg:
+                        name,value=arg.split('=')
+                    else:
+                        name=arg
+                        value=True
+                    name=name.replace('-','_')
+                    taskKwArgs[name]=value
+                    i+=1
                 # TODO: add further parsing to handle keyword arguments
-                parsed.append(TaskCall(mo.group('name'),args=taskArgs,kwargs={}))
+                parsed.append(TaskCall(mo.group('name'),args=taskArgs,kwargs=taskKwArgs))
             else:
                 raise Exception('Unknown task format: {}'.format(arg))
-        i+=1
     return parsed
 
 
