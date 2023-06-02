@@ -16,6 +16,7 @@ class RestAdmin(AdminBase):
     """
     Provides a proxy object for an ArcGIS Server instance, communicating with the REST Admin API.
     """
+
     @property
     def system(self):
         return self._system
@@ -31,6 +32,10 @@ class RestAdmin(AdminBase):
     @property
     def uploads(self):
         return self._uploads
+
+    @property
+    def _url_server_info(self):
+        return self._url_base + "/rest/info"
 
     @property
     def _url_full(self):

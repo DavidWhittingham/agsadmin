@@ -13,10 +13,12 @@ from .sharing_admin.portals import Portals
 from ._admin_base import AdminBase
 from ._utils import send_session_request
 
+
 class SharingAdmin(AdminBase):
     """
     Provides a proxy object for an ArcGIS Portal instance, communicating with the Sharing API.
     """
+
     @property
     def content(self):
         return self._content
@@ -28,6 +30,10 @@ class SharingAdmin(AdminBase):
     @property
     def portals(self):
         return self._portals
+
+    @property
+    def _url_server_info(self):
+        return self._url_full + "/portals/info"
 
     @property
     def _url_full(self):
@@ -99,6 +105,17 @@ class SharingAdmin(AdminBase):
         self._community = Community(self._session, self.url)
         self._portals = Portals(self._session, self.url)
 
+    def get_version(self):
+        """Gets the version of the Portal Sharing API.
+
+        Returns:
+            str: The API version number.
+        """
+
+        r = self._create_operation_request(self, method="GET")
+        root_info = send_session_request(self._session, r).json()
+        return root_info["currentVersion"]
+
     def search(self, search_params):
         """Searches for content items in Portal.
 
@@ -109,8 +126,7 @@ class SharingAdmin(AdminBase):
             dict: The JSON search response.
         """
 
-        search_params = search_params._get_params() if isinstance(
-            search_params, SearchParams) else search_params
+        search_params = search_params._get_params() if isinstance(search_params, SearchParams) else search_params
 
         r = self._create_operation_request(self._url_full, "search", method="POST", data=search_params)
 

@@ -4,8 +4,6 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input, int, map, nex
 
 import abc
 
-from os import environ
-
 from requests import Request, Session
 
 from ._auth import _RestAdminAuth
@@ -32,6 +30,10 @@ class AdminBase(EndpointBase):
     @property
     def username(self):
         return self._pdata["username"]
+
+    @abc.abstractproperty
+    def _url_server_info(self):
+        pass
 
     def __init__(self, hostname, username, password, instance_name, port, use_ssl, utc_delta, proxy, encrypt, verify,
                  generate_token_url):
@@ -116,4 +118,4 @@ class AdminBase(EndpointBase):
                 verify=verify)
 
     def get_server_info(self):
-        return send_session_request(self._session, Request("GET", "{0}/rest/info".format(self._url_base)), True).json()
+        return send_session_request(self._session, Request("GET", self._url_server_info), True).json()
