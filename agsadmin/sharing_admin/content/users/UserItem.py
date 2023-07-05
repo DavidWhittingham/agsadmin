@@ -13,6 +13,7 @@ from .UserItemStatusParams import UserItemStatusParams
 
 
 class UserItem(ItemBase):
+
     @property
     def username(self):
         return self._pdata["username"]
@@ -66,6 +67,10 @@ class UserItem(ItemBase):
         """
         return self._get().get("sharing")
 
+    def protect(self):
+        r = self._create_operation_request(self, "protect", method="POST")
+        return send_session_request(self._session, r).json()
+
     def share(self, share_user_item_params):
         share_user_item_params = share_user_item_params._get_params() if isinstance(
             share_user_item_params, ShareUserItemParams) else share_user_item_params
@@ -76,6 +81,10 @@ class UserItem(ItemBase):
         user_item_status_params = user_item_status_params._get_params() if isinstance(
             user_item_status_params, UserItemStatusParams) else user_item_status_params
         r = self._create_operation_request(self, "status", method="POST", data=user_item_status_params)
+        return send_session_request(self._session, r).json()
+
+    def unprotect(self):
+        r = self._create_operation_request(self, "unprotect", method="POST")
         return send_session_request(self._session, r).json()
 
     def update(self, update_item_params):
