@@ -10,6 +10,7 @@ from ..._utils import send_session_request
 from ._permissions_mixin import _PermissionsMixin
 from .Folder import Folder
 
+
 class Service(_PermissionsMixin, EndpointBase):
     """
     Base class for all types of ArcGIS Server services. Implements the core operations supported by all services,
@@ -76,6 +77,14 @@ class Service(_PermissionsMixin, EndpointBase):
         """
         return send_session_request(self._session, self._create_operation_request(self._url_full, "iteminfo")).json()
 
+    def get_manifest(self):
+        """
+        Gets the manifest document of the service if it exists.
+        """
+        return send_session_request(self._session,
+                                    self._create_operation_request(self._url_full,
+                                                                   "iteminfo/manifest/manifest.json")).json()
+
     def get_properties(self):
         """
         Gets the properties of the service.
@@ -100,16 +109,13 @@ class Service(_PermissionsMixin, EndpointBase):
         """
         result = send_session_request(
             self._session,
-            self._create_operation_request(
-                self._url_parent,
-                "renameService",
-                data = {
-                    "serviceName": self.name,
-                    "serviceType": self._type,
-                    "serviceNewName": new_service_name
-                }
-            )
-        ).json()
+            self._create_operation_request(self._url_parent,
+                                           "renameService",
+                                           data={
+                                               "serviceName": self.name,
+                                               "serviceType": self._type,
+                                               "serviceNewName": new_service_name
+                                           })).json()
 
         self._name = new_service_name
 
@@ -146,7 +152,7 @@ class Service(_PermissionsMixin, EndpointBase):
         return send_session_request(self._session, r).json()
 
     @staticmethod
-    def _get_service_url(base_url, service_name, service_type, folder = None):
+    def _get_service_url(base_url, service_name, service_type, folder=None):
         """
         Constructs the full URL for a service endpoint.
 
@@ -163,14 +169,10 @@ class Service(_PermissionsMixin, EndpointBase):
         :type folder_name: str
         """
         return ("{base}/services/{folder}/{name}.{type}" if folder else "{base}/services/{name}.{type}").format(
-                base = base_url,
-                folder = folder,
-                name = service_name,
-                type = service_type
-            )
+            base=base_url, folder=folder, name=service_name, type=service_type)
 
     @staticmethod
-    def _get_service_root_url(base_url, folder = None):
+    def _get_service_root_url(base_url, folder=None):
         """
         Constructs the full root URL for a service endpoint (i.e. it's parent folder, or the top level services folder).
 
@@ -180,7 +182,4 @@ class Service(_PermissionsMixin, EndpointBase):
         :param folder_name: If the service is not at the root level, specify the folder it resides in.
         :type folder_name: str
         """
-        return ("{base}/services/{folder}" if folder else "{base}/services").format(
-                base = base_url,
-                folder = folder
-            )
+        return ("{base}/services/{folder}" if folder else "{base}/services").format(base=base_url, folder=folder)
